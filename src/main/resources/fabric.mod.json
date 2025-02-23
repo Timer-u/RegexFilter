@@ -1,38 +1,37 @@
 {
-	"schemaVersion": 1,
-	"id": "regexfilter",
-	"version": "${version}",
-	"name": "RegexFilter",
-	"description": "用正则表达式过滤你的聊天！",
-	"authors": [
-		"Timer"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/Timer-keeper/RegexFilter"
-	},
-	"license": "GPL-v3.0 license",
-	"icon": "assets/regexfilter/icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"client": ["com.timer.RegexFilterClient"]
-		"modmenu": ["com.timer.RegexFilterClient"]
-	},
-	"mixins": [
-		"regexfilter.mixins.json",
-		{
-			"config": "regexfilter.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": "~1.21",
-		"java": ">=21",
-		"fabric-api": "*"
-		"cloth-config": ">=15.0.140"
-		"modmenu": ">=11.0.3"
-	},
-	"suggests": {
-	}
+  "schemaVersion": 1,
+  "id": "regexfilter",
+  "version": "${version}",
+  "name": "RegexFilter",
+  "description": "用正则表达式过滤你的聊天！",
+  "authors": [
+    "Timer"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/Timer-keeper/RegexFilter"
+  },
+  "license": "GPL-v3.0 license",
+  "icon": "assets/regexfilter/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.timer.RegexFilterClient"],
+    "modmenu": ["com.timer.RegexFilterClient"]
+  },
+  "mixins": [
+    "regexfilter.mixins.json",
+    {
+      "config": "regexfilter.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21",
+    "java": ">=21",
+    "fabric-api": "*",
+    "cloth-config": ">=15.0.140",
+    "modmenu": ">=11.0.3"
+  },
+  "suggests": {}
 }
