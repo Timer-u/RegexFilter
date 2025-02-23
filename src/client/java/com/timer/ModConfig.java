@@ -25,7 +25,7 @@ public class ModConfig {
             String json = Files.readString(CONFIG_PATH);
             ModConfig config = GSON.fromJson(json, ModConfig.class);
             enabled = config.enabled;
-            regexFilters = config.regexFilters;
+            regexFilters = new ArrayList<>(config.regexFilters); // 深拷贝防止外部修改
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -34,7 +34,12 @@ public class ModConfig {
     // 保存配置到文件
     public static void save() {
         try {
-            String json = GSON.toJson(this);
+            // 创建临时实例保存当前状态
+            ModConfig config = new ModConfig();
+            config.enabled = enabled;
+            config.regexFilters = new ArrayList<>(regexFilters);
+            
+            String json = GSON.toJson(config);
             Files.writeString(CONFIG_PATH, json);
         } catch (IOException e) {
             e.printStackTrace();
