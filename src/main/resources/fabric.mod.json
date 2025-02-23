@@ -3,24 +3,20 @@
 	"id": "regexfilter",
 	"version": "${version}",
 	"name": "RegexFilter",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "用正则表达式过滤你的聊天！",
 	"authors": [
-		"Me!"
+		"Timer"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Timer-keeper/RegexFilter"
 	},
-	"license": "CC0-1.0",
+	"license": "GPL-v3.0 license",
 	"icon": "assets/regexfilter/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"com.timer.RegexFilter"
-		],
-		"client": [
-			"com.timer.RegexFilterClient"
-		]
+		"client": ["com.timer.RegexFilterClient"]
+		"modmenu": ["com.timer.RegexFilterClient"]
 	},
 	"mixins": [
 		"regexfilter.mixins.json",
@@ -34,8 +30,9 @@
 		"minecraft": "~1.21",
 		"java": ">=21",
 		"fabric-api": "*"
+		"cloth-config": ">=15.0.140"
+		"modmenu": ">=11.0.3"
 	},
 	"suggests": {
-		"another-mod": "*"
 	}
 }
