@@ -23,9 +23,5 @@
 hs_err_pid*
 replay_pid*
 
-#back up files
-<<<<<<< HEAD
+# back up files
 *.bak
-=======
-*.bak
->>>>>>> origin/dev
