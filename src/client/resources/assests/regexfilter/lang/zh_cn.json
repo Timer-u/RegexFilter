@@ -1,0 +1,6 @@
+{
+  "title.regexfilter.config": "正则过滤器配置",
+  "category.general": "通用设置",
+  "option.enabled": "启用模组",
+  "option.regex_list": "正则表达式列表"
+}

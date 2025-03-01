@@ -1,0 +1,6 @@
+{
+  "title.regexfilter.config": "RegexFilter Configuration",
+  "category.general": "General Settings",
+  "option.enabled": "Enable Mod",
+  "option.regex_list": "Regex Patterns"
+}
