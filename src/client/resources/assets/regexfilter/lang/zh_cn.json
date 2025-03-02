@@ -2,7 +2,9 @@
   "title.regexfilter.config": "正则过滤器配置",
   "category.general": "通用设置",
   "option.enabled": "启用模组",
-  "option.regex_list": "正则表达式列表"
+  "option.regex_list": "正则表达式列表",
+  "tooltip.regex_list.1": "输入正则表达式以过滤聊天消息。示例：",
+  "tooltip.regex_list.2": "^\\[系统\\].*  - 屏蔽以[系统]开头的消息",
   "modmenu.nameTranslation.regexfilter": "正则过滤器",
   "modmenu.descriptionTranslation.regexfilter": "基于正则表达式的高级聊天过滤器"
 }

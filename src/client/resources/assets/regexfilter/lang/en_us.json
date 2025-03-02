@@ -2,7 +2,9 @@
   "title.regexfilter.config": "RegexFilter Configuration",
   "category.general": "General Settings",
   "option.enabled": "Enable Mod",
-  "option.regex_list": "Regex Patterns"
+  "option.regex_list": "Regex Patterns",
+  "tooltip.regex_list.1": "Enter regular expressions to filter chat messages. Example:",
+  "tooltip.regex_list.2": "^\\[System\\].*  - Blocks messages starting with [System]",
   "modmenu.nameTranslation.regexfilter": "RegexFilter",
   "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns"
 }
