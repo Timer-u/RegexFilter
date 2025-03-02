@@ -3,8 +3,12 @@
   "category.general": "General Settings",
   "option.enabled": "Enable Mod",
   "option.regex_list": "Regex Patterns",
-  "tooltip.regex_list.1": "Enter regular expressions to filter chat messages. Example:",
-  "tooltip.regex_list.2": "^\\[System\\].*  - Blocks messages starting with [System]",
+  "tooltip.enabled": "Toggle mod functionality",
+  "tooltip.regex_list.1": "Messages matching any pattern will be blocked",
+  "tooltip.regex_list.2": "Use standard Java regex syntax",
+  "tooltip.regex_list.3": "Example: ^\\[System\\].*  - Block system messages",
+  "error.invalid_regex": "Invalid regular expression!",
+  "button.reset_defaults": "Reset to Defaults",
   "modmenu.nameTranslation.regexfilter": "RegexFilter",
   "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns"
 }

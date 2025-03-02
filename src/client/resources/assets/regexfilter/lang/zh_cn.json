@@ -3,8 +3,12 @@
   "category.general": "通用设置",
   "option.enabled": "启用模组",
   "option.regex_list": "正则表达式列表",
-  "tooltip.regex_list.1": "输入正则表达式以过滤聊天消息。示例：",
-  "tooltip.regex_list.2": "^\\[系统\\].*  - 屏蔽以[系统]开头的消息",
+  "tooltip.enabled": "切换模组功能开关",
+  "tooltip.regex_list.1": "匹配任意正则表达式的消息将被屏蔽",
+  "tooltip.regex_list.2": "使用标准的Java正则语法",
+  "tooltip.regex_list.3": "示例：^\\[系统\\].*  - 屏蔽系统公告",
+  "error.invalid_regex": "无效的正则表达式！",
+  "button.reset_defaults": "恢复默认设置",
   "modmenu.nameTranslation.regexfilter": "正则过滤器",
   "modmenu.descriptionTranslation.regexfilter": "基于正则表达式的高级聊天过滤器"
 }
