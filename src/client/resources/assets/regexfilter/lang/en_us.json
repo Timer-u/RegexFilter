@@ -3,4 +3,6 @@
   "category.general": "General Settings",
   "option.enabled": "Enable Mod",
   "option.regex_list": "Regex Patterns"
+  "modmenu.nameTranslation.regexfilter": "RegexFilter",
+  "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns"
 }

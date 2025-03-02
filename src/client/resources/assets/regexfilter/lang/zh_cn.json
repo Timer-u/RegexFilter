@@ -3,4 +3,6 @@
   "category.general": "通用设置",
   "option.enabled": "启用模组",
   "option.regex_list": "正则表达式列表"
+  "modmenu.nameTranslation.regexfilter": "正则过滤器",
+  "modmenu.descriptionTranslation.regexfilter": "基于正则表达式的高级聊天过滤器"
 }
