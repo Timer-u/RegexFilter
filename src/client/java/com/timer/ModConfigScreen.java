@@ -12,21 +12,19 @@ public class ModConfigScreen {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Text.translatable("title.regexfilter.config"))
-                .setSavingRunnable(() -> ModConfig.save()); // 直接调用静态保存方法
+                .setSavingRunnable(ModConfig::save);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("category.general"));
 
-        // 总开关配置项
-        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("option.enabled"), ModConfig.enabled)
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("option.enabled"), ModConfig.getInstance().enabled)
                 .setDefaultValue(true)
-                .setSaveConsumer(newValue -> ModConfig.enabled = newValue)
+                .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
                 .build());
 
-        // 正则列表配置项
-        general.addEntry(entryBuilder.startStrList(Text.translatable("option.regex_list"), ModConfig.regexFilters)
+        general.addEntry(entryBuilder.startStrList(Text.translatable("option.regex_list"), ModConfig.getInstance().regexFilters)
                 .setDefaultValue(new ArrayList<>())
-                .setSaveConsumer(newList -> ModConfig.regexFilters = new ArrayList<>(newList)) // 深拷贝
+                .setSaveConsumer(newList -> ModConfig.getInstance().regexFilters = new ArrayList<>(newList))
                 .build());
 
         return builder.build();

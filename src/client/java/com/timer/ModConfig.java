@@ -10,36 +10,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModConfig {
-    public static boolean enabled = true;
-    public static List<String> regexFilters = new ArrayList<>();
+    // 实例字段
+    public boolean enabled = true;
+    public List<String> regexFilters = new ArrayList<>();
+    
+    // 单例管理
+    private static ModConfig INSTANCE = new ModConfig();
+    public static ModConfig getInstance() { return INSTANCE; }
+    
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("regexfilter.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    // 从文件加载配置
+    // 加载配置
     public static void load() {
         try {
             if (!Files.exists(CONFIG_PATH)) {
-                save(); // 如果文件不存在，创建默认配置
+                save();
                 return;
             }
             String json = Files.readString(CONFIG_PATH);
-            ModConfig config = GSON.fromJson(json, ModConfig.class);
-            enabled = config.enabled;
-            regexFilters = new ArrayList<>(config.regexFilters); // 深拷贝防止外部修改
+            INSTANCE = GSON.fromJson(json, ModConfig.class); // 覆盖单例
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // 保存配置到文件
+    // 保存配置
     public static void save() {
         try {
-            // 创建临时实例保存当前状态
-            ModConfig config = new ModConfig();
-            config.enabled = enabled;
-            config.regexFilters = new ArrayList<>(regexFilters);
-            
-            String json = GSON.toJson(config);
+            String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);
         } catch (IOException e) {
             e.printStackTrace();
