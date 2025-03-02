@@ -3,6 +3,8 @@ package com.timer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModConfig {
+    // 日志记录器
+    private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
+    
     // 实例字段
     public boolean enabled = true;
     public List<String> regexFilters = new ArrayList<>();
@@ -23,25 +28,30 @@ public class ModConfig {
 
     // 加载配置
     public static void load() {
+        LOGGER.info("Loading config...");
         try {
             if (!Files.exists(CONFIG_PATH)) {
+                LOGGER.info("Config file not found, creating default");
                 save();
                 return;
             }
             String json = Files.readString(CONFIG_PATH);
-            INSTANCE = GSON.fromJson(json, ModConfig.class); // 覆盖单例
+            INSTANCE = GSON.fromJson(json, ModConfig.class);
+            LOGGER.info("Config loaded successfully");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to load config", e);
         }
     }
 
     // 保存配置
     public static void save() {
+        LOGGER.debug("Saving config...");
         try {
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);
+            LOGGER.info("Config saved successfully");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to save config", e);
         }
     }
 }
