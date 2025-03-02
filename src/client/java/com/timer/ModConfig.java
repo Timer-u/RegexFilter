@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModConfig {
-    // 日志记录器
     private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
     
     // 实例字段
@@ -26,7 +25,7 @@ public class ModConfig {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("regexfilter.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    // 加载配置
+    // 加载配置（带有空条目过滤）
     public static void load() {
         LOGGER.info("Loading config...");
         try {
@@ -37,14 +36,27 @@ public class ModConfig {
             }
             String json = Files.readString(CONFIG_PATH);
             INSTANCE = GSON.fromJson(json, ModConfig.class);
+            
+            // 清理无效条目
+            if (INSTANCE.regexFilters == null) {
+                INSTANCE.regexFilters = new ArrayList<>();
+            } else {
+                INSTANCE.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
+            }
+            
             LOGGER.info("Config loaded successfully");
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
     }
 
-    // 保存配置
+    // 保存配置（带有空条目过滤）
     public static void save() {
+        // 清理无效条目
+        if (INSTANCE.regexFilters != null) {
+            INSTANCE.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
+        }
+        
         LOGGER.debug("Saving config...");
         try {
             String json = GSON.toJson(INSTANCE);
