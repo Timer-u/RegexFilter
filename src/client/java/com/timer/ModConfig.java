@@ -15,9 +15,9 @@ import java.util.List;
 public class ModConfig {
     private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
     
-    // 实例字段（设置包含示例的默认值）
+    // 实例字段
     public boolean enabled = true;
-    public List<String> regexFilters = new ArrayList<>(Collections.singletonList("^\\[系统\\].*"));
+    public List<String> regexFilters = new ArrayList<>();
     
     // 单例管理
     private static ModConfig INSTANCE = new ModConfig();

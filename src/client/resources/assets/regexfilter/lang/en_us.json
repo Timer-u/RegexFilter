@@ -10,5 +10,10 @@
   "error.invalid_regex": "Invalid regular expression!",
   "button.reset_defaults": "Reset to Defaults",
   "modmenu.nameTranslation.regexfilter": "RegexFilter",
-  "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns"
+  "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns",
+  "text.cloth-config.on": "On",
+  "text.cloth-config.off": "Off",
+  "text.cloth-config.reset_value": "Reset",
+  "text.cloth-config.list.add": "Add Regex",
+  "text.cloth-config.list.remove": "Remove Selected"
 }

@@ -10,5 +10,10 @@
   "error.invalid_regex": "无效的正则表达式！",
   "button.reset_defaults": "恢复默认设置",
   "modmenu.nameTranslation.regexfilter": "正则过滤器",
-  "modmenu.descriptionTranslation.regexfilter": "基于正则表达式的高级聊天过滤器"
+  "modmenu.descriptionTranslation.regexfilter": "基于正则表达式的高级聊天过滤器",
+  "text.cloth-config.on": "开启",
+  "text.cloth-config.off": "关闭",
+  "text.cloth-config.reset_value": "重置",
+  "text.cloth-config.list.add": "添加正则表达式", 
+  "text.cloth-config.list.remove": "删除选中项"
 }
