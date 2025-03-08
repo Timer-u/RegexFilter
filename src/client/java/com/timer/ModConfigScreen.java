@@ -61,19 +61,15 @@ public class ModConfigScreen {
                 )
                 .build());
 
-        // 使用Cloth Config标准API创建按钮
-        general.addEntry(entryBuilder.startButton(
-                Text.translatable("button.reset_defaults"),
-                ButtonWidget.builder(
-                        Text.translatable("button.reset_defaults"),
-                        button -> {
-                            ModConfig.getInstance().enabled = DEFAULT_ENABLED;
-                            ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
-                            ModConfig.save();
-                            MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
-                        }
-                ).build()
-        ).build());
+        // 使用原生按钮组件直接添加到配置分类
+        general.addEntry(new ButtonWidget.Builder(Text.translatable("button.reset_defaults"), button -> {
+                    ModConfig.getInstance().enabled = DEFAULT_ENABLED;
+                    ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
+                    ModConfig.save();
+                    MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
+                })
+                .dimensions(0, 0, 200, 20)
+                .build());
 
         return builder.build();
     }
