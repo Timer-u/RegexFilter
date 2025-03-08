@@ -16,12 +16,23 @@ import java.util.regex.PatternSyntaxException;
 public class ModConfigScreen {
     private static final boolean DEFAULT_ENABLED = true;
     private static final ArrayList<String> DEFAULT_REGEX = new ArrayList<>(Collections.singletonList("^\\[系统\\].*"));
+    
+    // 虚拟重置开关状态（不保存到实际配置）
+    private static boolean resetTrigger = false;
 
     public static Screen createConfigScreen(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Text.translatable("title.regexfilter.config"))
-                .setSavingRunnable(ModConfig::save)
+                .setSavingRunnable(() -> {
+                    // 保存时检查重置触发标记
+                    if (resetTrigger) {
+                        resetTrigger = false;
+                        ModConfig.getInstance().enabled = DEFAULT_ENABLED;
+                        ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
+                        ModConfig.save();
+                    }
+                })
                 .setDefaultBackgroundTexture(Identifier.of("minecraft", "textures/block/stone.png"));
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
@@ -62,15 +73,17 @@ public class ModConfigScreen {
                 )
                 .build());
 
-        // 重置按钮（使用Lambda实现重置逻辑）
-        general.addEntry(entryBuilder.startTextDescription(Text.translatable("button.reset_defaults"))
-                .setTooltip(Text.translatable("tooltip.reset_defaults"))
-                .setSaveConsumer(btn -> {
-                    ModConfig.getInstance().enabled = DEFAULT_ENABLED;
-                    ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
-                    ModConfig.save();
-                    MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
+        // 重置按钮（虚拟开关）
+        general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("button.reset_defaults"), false)
+                .setDefaultValue(false)
+                .setSaveConsumer(trigger -> {
+                    if (trigger) {
+                        resetTrigger = true; // 设置重置标记
+                        MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
+                    }
                 })
+                .setYesNoTextSupplier(value -> 
+                    value ? Text.translatable("action.triggered") : Text.translatable("button.reset_defaults"))
                 .build());
 
         return builder.build();
