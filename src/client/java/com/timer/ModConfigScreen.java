@@ -57,7 +57,7 @@ public class ModConfigScreen {
                 })
                 .setTooltip(
                     Text.translatable("tooltip.regex_list.1"),
-                    Text.translatable("tooltip.regex_list.2"),
+                    Text.translatable("tooltip.regex_list.2")
                 )
                 .requireRestart()
                 .build());
