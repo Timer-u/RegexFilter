@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import java.util.ArrayList;
@@ -60,14 +61,13 @@ public class ModConfigScreen {
                 )
                 .build());
 
-        general.addEntry(entryBuilder.startTextButton(Text.translatable("button.reset_defaults"))
-                .setButtonBuilder(button -> button
-                        .onPress(b -> {
-                            ModConfig.getInstance().enabled = DEFAULT_ENABLED;
-                            ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
-                            ModConfig.save();
-                            MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
-                        }))
+        general.addEntry(entryBuilder.startButton(Text.translatable("button.reset_defaults"), 
+                ButtonWidget.builder(Text.translatable("button.reset_defaults"), button -> {
+                    ModConfig.getInstance().enabled = DEFAULT_ENABLED;
+                    ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
+                    ModConfig.save();
+                    MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
+                }).build())
                 .build());
 
         return builder.build();
