@@ -3,7 +3,6 @@ package com.timer;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.impl.builders.ButtonBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -28,14 +27,14 @@ public class ModConfigScreen {
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("category.general"));
 
-        // 添加启用开关
+        // 启用开关
         general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("option.enabled"), ModConfig.getInstance().enabled)
                 .setDefaultValue(DEFAULT_ENABLED)
                 .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
                 .setTooltip(Text.translatable("tooltip.enabled"))
                 .build());
 
-        // 添加正则表达式列表
+        // 正则表达式列表
         general.addEntry(entryBuilder.startStrList(Text.translatable("option.regex_list"), 
                     ModConfig.getInstance().regexFilters)
                 .setDefaultValue(DEFAULT_REGEX)
@@ -63,16 +62,15 @@ public class ModConfigScreen {
                 )
                 .build());
 
-        // 添加重置按钮（使用ButtonBuilder）
-        general.addEntry(new ButtonBuilder(
-                Text.translatable("button.reset_defaults"),
-                () -> {
+        // 重置按钮（使用Lambda实现重置逻辑）
+        general.addEntry(entryBuilder.startTextDescription(Text.translatable("button.reset_defaults"))
+                .setTooltip(Text.translatable("tooltip.reset_defaults"))
+                .setSaveConsumer(btn -> {
                     ModConfig.getInstance().enabled = DEFAULT_ENABLED;
                     ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
                     ModConfig.save();
                     MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
                 })
-                .setButtonWidth(200)  // 设置按钮宽度
                 .build());
 
         return builder.build();
