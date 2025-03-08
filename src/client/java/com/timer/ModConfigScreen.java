@@ -6,7 +6,6 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.ButtonBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import java.util.ArrayList;
@@ -29,12 +28,14 @@ public class ModConfigScreen {
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("category.general"));
 
+        // 添加启用开关
         general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("option.enabled"), ModConfig.getInstance().enabled)
                 .setDefaultValue(DEFAULT_ENABLED)
                 .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
                 .setTooltip(Text.translatable("tooltip.enabled"))
                 .build());
 
+        // 添加正则表达式列表
         general.addEntry(entryBuilder.startStrList(Text.translatable("option.regex_list"), 
                     ModConfig.getInstance().regexFilters)
                 .setDefaultValue(DEFAULT_REGEX)
@@ -62,7 +63,7 @@ public class ModConfigScreen {
                 )
                 .build());
 
-
+        // 添加重置按钮（使用ButtonBuilder）
         general.addEntry(new ButtonBuilder(
                 Text.translatable("button.reset_defaults"),
                 () -> {
@@ -71,7 +72,7 @@ public class ModConfigScreen {
                     ModConfig.save();
                     MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
                 })
-                .setButtonWidth(200)
+                .setButtonWidth(200)  // 设置按钮宽度
                 .build());
 
         return builder.build();
