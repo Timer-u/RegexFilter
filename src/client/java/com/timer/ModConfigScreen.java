@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class ModConfigScreen {
-    // 定义与ModConfig一致的默认配置
     private static final boolean DEFAULT_ENABLED = true;
     private static final ArrayList<String> DEFAULT_REGEX = new ArrayList<>(Collections.singletonList("^\\[系统\\].*"));
 
@@ -24,20 +23,19 @@ public class ModConfigScreen {
                 .setParentScreen(parent)
                 .setTitle(Text.translatable("title.regexfilter.config"))
                 .setSavingRunnable(ModConfig::save)
-                .setDefaultBackgroundTexture(new Identifier("textures/block/stone.png"));
+                .setDefaultBackgroundTexture(new Identifier("minecraft", "textures/block/stone.png")); 
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("category.general"));
 
-        // 启用模组开关
         general.addEntry(entryBuilder.startBooleanToggle(Text.translatable("option.enabled"), ModConfig.getInstance().enabled)
                 .setDefaultValue(DEFAULT_ENABLED)
                 .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
                 .setTooltip(Text.translatable("tooltip.enabled"))
                 .build());
 
-        // 正则表达式列表优化
-        general.addEntry(entryBuilder.startStringList(Text.translatable("option.regex_list"), 
+        
+        general.addEntry(entryBuilder.startStrList(Text.translatable("option.regex_list"), 
                     ModConfig.getInstance().regexFilters)
                 .setDefaultValue(DEFAULT_REGEX)
                 .setInsertButtonEnabled(true)
@@ -64,14 +62,14 @@ public class ModConfigScreen {
                 )
                 .build());
 
-        // 重置按钮配置
-        builder.setDefaultButtonSupplier(() -> new ButtonWidget.Builder(Text.translatable("button.reset_defaults"), button -> {
+        
+        general.addEntry(entryBuilder.startButton()
+                .setButton(new ButtonWidget.Builder(Text.translatable("button.reset_defaults"), button -> {
                     ModConfig.getInstance().enabled = DEFAULT_ENABLED;
                     ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
                     ModConfig.save();
                     MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
-                })
-                .size(100, 20)
+                }).build())
                 .build());
 
         return builder.build();
