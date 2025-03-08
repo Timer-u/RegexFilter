@@ -55,20 +55,28 @@ public class ModConfig {
         }
     }
 
-    // 保存配置（优化日志输出）
+    // 保存配置
     public static void save() {
-        // 执行数据清洗
-        List<String> cleanList = new ArrayList<>(INSTANCE.regexFilters);
-        cleanList.removeIf(str -> str == null || str.trim().isEmpty());
+       //数据清洗
+         List<String> cleanList = new ArrayList<>(INSTANCE.regexFilters);
+        cleanList.removeIf(str -> {
+            if(str == null || str.trim().isEmpty()) return true;
+            try {
+                Pattern.compile(str);
+                return false;
+            } catch (PatternSyntaxException e) {
+                LOGGER.warn("Removing invalid pattern: {}", str);
+                return true;
+            }
+        });
+        
         INSTANCE.regexFilters = cleanList;
-
-        LOGGER.debug("Saving config with {} patterns", cleanList.size());
+        
         try {
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);
-            LOGGER.info("Config saved to {}", CONFIG_PATH);
         } catch (IOException e) {
-            LOGGER.error("Failed to save config", e);
+            LOGGER.error("Config save failed", e);
         }
     }
 }

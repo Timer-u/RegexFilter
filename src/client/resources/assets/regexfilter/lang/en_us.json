@@ -3,17 +3,12 @@
   "category.general": "General Settings",
   "option.enabled": "Enable Mod",
   "option.regex_list": "Regex Patterns",
-  "tooltip.enabled": "Toggle mod functionality",
-  "tooltip.regex_list.1": "Messages matching any pattern will be blocked",
-  "tooltip.regex_list.2": "Use standard Java regex syntax",
-  "tooltip.regex_list.3": "Example: ^\\[System\\].*  - Block system messages",
-  "error.invalid_regex": "Invalid regular expression!",
-  "button.reset_defaults": "Reset to Defaults",
+  "tooltip.enabled": "Toggle chat filtering functionality",
+  "tooltip.regex_list.1": "Use Java regex syntax (^ for start, $ for end)",
+  "tooltip.regex_list.2": "Example: ^\\[System\\].* blocks system messages",
+  "error.invalid_regex.detail": "Invalid pattern: %s",
   "modmenu.nameTranslation.regexfilter": "RegexFilter",
   "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns",
-  "text.cloth-config.on": "On",
-  "text.cloth-config.off": "Off",
-  "text.cloth-config.reset_value": "Reset",
-  "text.cloth-config.list.add": "Add Regex",
-  "text.cloth-config.list.remove": "Remove Selected"
+  "text.cloth-config.on": "Enabled",
+  "text.cloth-config.off": "Disabled"
 }
