@@ -3,6 +3,7 @@ package com.timer;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.ButtonBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -13,7 +14,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.function.Supplier;
 
 public class ModConfigScreen {
     private static final boolean DEFAULT_ENABLED = true;
@@ -62,20 +62,17 @@ public class ModConfigScreen {
                 )
                 .build());
 
-        // 使用Cloth Config标准API创建配置按钮
-        general.addEntry(entryBuilder.startButton(
+
+        general.addEntry(new ButtonBuilder(
                 Text.translatable("button.reset_defaults"),
-                () -> ButtonWidget.builder(
-                        Text.translatable("button.reset_defaults"),
-                        button -> {
-                            ModConfig.getInstance().enabled = DEFAULT_ENABLED;
-                            ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
-                            ModConfig.save();
-                            MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
-                        })
-                        .width(200)  // 设置按钮宽度
-                        .build()
-        ).build());
+                () -> {
+                    ModConfig.getInstance().enabled = DEFAULT_ENABLED;
+                    ModConfig.getInstance().regexFilters = new ArrayList<>(DEFAULT_REGEX);
+                    ModConfig.save();
+                    MinecraftClient.getInstance().setScreen(createConfigScreen(parent));
+                })
+                .setButtonWidth(200)
+                .build());
 
         return builder.build();
     }
