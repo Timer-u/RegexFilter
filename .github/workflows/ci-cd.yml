@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    paths:
+      - 'src/**'
+      - '*.gradle'
+      - 'gradle.properties'
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - 'LICENSE'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  format-and-build:
+    name: Format & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.ref == 'refs/heads/dev'  # 仅在dev分支执行
+    env:
+      JAVA_VERSION: 21
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Fix permissions
+        run: chmod +x gradlew
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
+      - name: Auto-format code
+        run: |
+          ./gradlew spotlessApply
+          git config --global user.name "CI Bot"
+          git config --global user.email "ci@example.com"
+          git add .
+          git commit -m "🔧 Auto-format code [skip ci]" || echo "No formatting changes"
+          git push origin HEAD:dev
+
+      - name: Build artifact
+        run: ./gradlew build -x test
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-package
+          path: build/libs/*.jar
+
+  release:
+    name: Publish Release
+    needs: format-and-build
+    if: github.ref == 'refs/heads/main'  # 仅在main分支执行
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mod-package
+          path: release/
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{
+            format('{0:%Y%m%d}-{1}', 
+            github.event.head_commit.timestamp, 
+            github.run_number)
+          }}
+          files: release/*.jar
+          draft: false
+          generate_release_notes: true
+          discussion_category_name: "Releases"
