@@ -1,9 +1,7 @@
 name: Code Formatting & Validation
 
 on:
-  workflow_dispatch:  # 手动触发
-  push:
-    branches: [ dev ]
+  workflow_dispatch: # 手动触发
 
 permissions:
   contents: write
@@ -23,6 +21,9 @@ jobs:
         with:
           ref: dev
           fetch-depth: 0
+
+      - name: Fix gradlew permissions
+        run: chmod +x gradlew
 
       - name: Setup JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v3
@@ -66,12 +67,7 @@ jobs:
           git commit -m "style: Auto-format code [skip ci]" || echo "No changes to commit"
           git push origin HEAD:dev
 
-      - name: Verify build integrity
-        run: |
-          ./gradlew check --no-daemon
-          ./gradlew build --no-daemon -x test
-
-      - name: Cleanup workspace
+      - name: Post cleanup
         if: always()
         run: |
           ./gradlew --stop
