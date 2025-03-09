@@ -24,7 +24,7 @@ jobs:
     name: Format & Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: github.ref == 'refs/heads/dev'  # 仅在dev分支执行
+    if: github.ref == 'refs/heads/dev'
     env:
       JAVA_VERSION: 21
       GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -75,7 +75,7 @@ jobs:
   release:
     name: Publish Release
     needs: format-and-build
-    if: github.ref == 'refs/heads/main'  # 仅在main分支执行
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -91,11 +91,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{
-            format('{0:%Y%m%d}-{1}', 
-            github.event.head_commit.timestamp, 
-            github.run_number)
-          }}
+          tag_name: "v${{ format('{0:%Y%m%d}-{1}', github.event.head_commit.timestamp, github.run_number) }}"
           files: release/*.jar
           draft: false
           generate_release_notes: true
