@@ -94,3 +94,27 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+// ====================== 代码格式化配置 ======================
+plugins {
+    id "com.diffplug.spotless" version "6.25.0"
+}
+
+spotless {
+    // 格式化 Java 文件
+    java {
+        target "src/**/*.java"  // 指定 Java 文件路径
+        googleJavaFormat("1.17.0").aosp()  // 使用 Google Java 格式
+        removeUnusedImports()  // 移除未使用的导入
+        trimTrailingWhitespace()  // 去除行尾空格
+        endWithNewline()  // 文件以换行符结尾
+    }
+
+    // 格式化 Gradle 文件
+    format 'gradle', {
+        target '*.gradle', 'gradle.properties'  // 指定 Gradle 文件路径
+        indentWithSpaces(4)  // 使用 4 个空格缩进
+        trimTrailingWhitespace()  // 去除行尾空格
+        endWithNewline()  // 文件以换行符结尾
+    }
+}

@@ -1,0 +1,4 @@
+src/client/resources/** linguist-generated=true
+*.json linguist-generated=true
+*.png linguist-language=Binary
+*.gradle text eol=lf
