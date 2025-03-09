@@ -1,7 +1,7 @@
 name: Code Formatting & Validation
 
 on:
-  workflow_dispatch: # 手动触发
+  workflow_dispatch: # 仅手动触发
 
 permissions:
   contents: write
@@ -22,8 +22,11 @@ jobs:
           ref: dev
           fetch-depth: 0
 
-      - name: Fix gradlew permissions
-        run: chmod +x gradlew
+      # 关键修复点：显式设置文件权限
+      - name: Fix executable permissions
+        run: |
+          chmod +x gradlew
+          git config --global core.fileMode true
 
       - name: Setup JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v3
