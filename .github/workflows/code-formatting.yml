@@ -1,4 +1,4 @@
-name: Code Formatting & Validation
+name: Code Formatting
 
 on:
   workflow_dispatch: # 仅手动触发
@@ -22,7 +22,6 @@ jobs:
           ref: dev
           fetch-depth: 0
 
-      # 关键修复点：显式设置文件权限
       - name: Fix executable permissions
         run: |
           chmod +x gradlew
