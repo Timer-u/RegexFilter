@@ -5,13 +5,10 @@ on:
     branches:
       - dev
       - main
-    paths:  # 只保留一个路径过滤参数
+    paths:  
       - 'src/**'
       - '*.gradle'
       - 'gradle.properties'
-      - '!**/*.md'      # 使用排除语法
-      - '!**/*.txt'
-      - '!LICENSE'
   workflow_dispatch:
 
 permissions:
