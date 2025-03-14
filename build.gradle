@@ -44,6 +44,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.0"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.10.0"
+    testImplementation "net.fabricmc:fabric-api-base:${project.fabric_version}"
     testImplementation "org.mockito:mockito-core:5.3.1"
     testImplementation "com.google.truth:truth:1.1.3"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
