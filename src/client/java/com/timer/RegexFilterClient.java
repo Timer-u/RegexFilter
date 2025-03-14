@@ -59,19 +59,26 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
         return ModConfigScreen::createConfigScreen;
     }
 
-    /**
-     * 测试专用方法 - 重构消息过滤逻辑
-     */
+    // 测试用方法
     static boolean shouldAllowMessage(Text message) {
-        // 重构为直接调用过滤逻辑
+        if (!ModConfig.getInstance().enabled) return true;
+
         String rawMessage = message.getString();
-        return !ModConfig.getInstance().regexFilters.stream()
-            .anyMatch(regex -> {
-                try {
-                    return Pattern.compile(regex).matcher(rawMessage).find();
-                } catch (PatternSyntaxException e) {
+        List<String> regexList = ModConfig.getInstance().regexFilters;
+
+        if (regexList == null || regexList.isEmpty()) {
+            return true;
+        }
+
+        for (String regex : regexList) {
+            try {
+                if (Pattern.compile(regex).matcher(rawMessage).find()) {
                     return false;
                 }
-            });
+            } catch (PatternSyntaxException e) {
+                LOGGER.error("Invalid regex pattern: {}", regex);
+            }
+        }
+        return true;
     }
 }
