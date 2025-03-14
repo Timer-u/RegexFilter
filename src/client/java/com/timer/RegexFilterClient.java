@@ -57,4 +57,9 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return ModConfigScreen::createConfigScreen;
     }
+
+    // 测试用暴露方法
+    static boolean shouldAllowMessage(Text message) {
+        return ClientReceiveMessageEvents.invokeAllowGame(message, false);
+    }
 }
