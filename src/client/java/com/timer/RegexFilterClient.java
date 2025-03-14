@@ -59,8 +59,19 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
         return ModConfigScreen::createConfigScreen;
     }
 
-    // 测试用暴露方法
+    /**
+     * 测试专用方法 - 重构消息过滤逻辑
+     */
     static boolean shouldAllowMessage(Text message) {
-        return ClientReceiveMessageEvents.invokeAllowGame(message, false);
+        // 重构为直接调用过滤逻辑
+        String rawMessage = message.getString();
+        return !ModConfig.getInstance().regexFilters.stream()
+            .anyMatch(regex -> {
+                try {
+                    return Pattern.compile(regex).matcher(rawMessage).find();
+                } catch (PatternSyntaxException e) {
+                    return false;
+                }
+            });
     }
 }
