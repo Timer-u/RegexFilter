@@ -27,9 +27,13 @@ public class ModConfig {
         return INSTANCE;
     }
 
-    private static final Path CONFIG_PATH =
+    private static Path CONFIG_PATH =
             FabricLoader.getInstance().getConfigDir().resolve("regexfilter.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    // 添加静态方法用于测试环境设置路径
+    public static void setConfigPathForTest(Path path) {
+        CONFIG_PATH = path;
 
     // 加载配置（增强null值处理）
     public static void load() {

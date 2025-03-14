@@ -14,8 +14,8 @@ public class ModConfigTest {
     @BeforeAll
     static void setup() throws IOException {
         tempConfig = Files.createTempFile("regexfilter-test", ".json");
-        ModConfig.CONFIG_PATH = tempConfig; // 重定向配置文件路径
-    }
+        ModConfig.setConfigPathForTest(tempConfig); // 使用新方法设置路径
+        }
     
     @AfterEach
     void reset() {
