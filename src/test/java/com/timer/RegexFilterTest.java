@@ -51,21 +51,35 @@ public class RegexFilterTest {
         assertShouldBlock("Specificphrase", false); 
     }
 
+    @AfterEach
+    void reset() {
+        // 重置配置到默认状态
+        ModConfig.getInstance().enabled = true;
+        ModConfig.getInstance().regexFilters.clear();
+        ModConfig.save();
+        ModConfig.load();
+    }
+
     @Test
     void shouldHandleInvalidRegexSafely() {
     // 设置包含无效正则的配置
-        config.regexFilters = List.of("valid.*", "[invalid[regex");
+        ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid[regex");
         ModConfig.save();
-        ModConfig.load(); // 强制重新加载清理后的配置
-    
-    // 重新获取配置实例
-        config = ModConfig.getInstance();
-    
-    // 验证清理后的正则列表
+        ModConfig.load();
+
+    // 获取最新实例
+        ModConfig config = ModConfig.getInstance();
+
+    // 验证正则列表和匹配逻辑
         assertThat(config.getCompiledPatterns()).hasSize(1);
+        Pattern validPattern = config.getCompiledPatterns().get(0);
+        assertThat(validPattern.matcher("[invalid[regex").find()).isFalse();
+
+    // 断言消息是否被屏蔽
         assertShouldBlock("valid123", true);
-        assertShouldBlock("[invalid[regex", false); // 无效正则已被移除
+        assertShouldBlock("[invalid[regex", false);
     }
+
     @Test
     void shouldRespectCaseInsensitiveFlag() {
         // 测试大小写不敏感特性
