@@ -67,7 +67,7 @@ public class RegexFilterTest {
     @Test
     void shouldHandleInvalidRegexSafely() {
         // 设置包含无效正则的配置
-        ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid[regex");
+        ModConfig.getInstance().regexFilters = List.of("^valid.*", "[invalid[regex"); // 添加 ^ 严格匹配开头
         ModConfig.save();
         ModConfig.load();
     
@@ -78,8 +78,8 @@ public class RegexFilterTest {
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
         
-        // 验证正则表达式确实为 "valid.*"
-        assertThat(validPattern.pattern()).isEqualTo("valid.*");
+        // 验证正则表达式
+        assertThat(validPattern.pattern()).isEqualTo("^valid.*");
         
         // 确保正则表达式不包含意外标志
         assertThat(validPattern.flags() & Pattern.CASE_INSENSITIVE).isEqualTo(0);
@@ -88,6 +88,7 @@ public class RegexFilterTest {
         assertThat(validPattern.matcher("valid123").find()).isTrue(); 
         assertThat(validPattern.matcher("[invalid[regex").find()).isFalse(); 
     
+        // 更新断言以反映正确行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
