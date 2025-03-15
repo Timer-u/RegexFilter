@@ -66,28 +66,33 @@ public class RegexFilterTest {
 
     @Test
     void shouldHandleInvalidRegexSafely() {
-    // 设置包含无效正则的配置
+        // 设置包含无效正则的配置
         ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid[regex");
         ModConfig.save();
         ModConfig.load();
-
-    // 获取最新实例
+    
+        // 获取最新实例
         ModConfig config = ModConfig.getInstance();
-
-    // 验证正则列表和匹配逻辑
+    
+        // 验证正则列表和匹配逻辑
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
+        
+        // 验证正则表达式确实为 "valid.*"
+        assertThat(validPattern.pattern()).isEqualTo("valid.*");
+        
+        // 确保正则表达式不包含意外标志
+        assertThat(validPattern.flags() & Pattern.CASE_INSENSITIVE).isEqualTo(0);
     
-    // 添加诊断日志
-        System.out.println("Testing pattern: " + validPattern.pattern());
-        boolean matches = validPattern.matcher("[invalid[regex").find();
-        System.out.println("Pattern matches '[invalid[regex': " + matches);
+        // 验证有效正则匹配正确字符串
+        assertThat(validPattern.matcher("valid123").find()).isTrue(); 
+        assertThat(validPattern.matcher("[invalid[regex").find()).isFalse(); 
     
-        assertThat(matches).isFalse(); // 明确断言不匹配
+        // 更新断言以反映正确行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
-
+    
     @Test
 void shouldRespectCaseInsensitiveFlag() {
     ModConfig.getInstance().regexFilters = List.of("(?i)casetest");
