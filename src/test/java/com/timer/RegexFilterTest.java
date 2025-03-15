@@ -30,24 +30,23 @@ public class RegexFilterTest {
     }
 
     @Test
-    void shouldAllowNonMatchingMessages() {
-        assertShouldBlock("Normal message", false);
-        assertShouldBlock("[Info] Player joined", false);
-        assertShouldBlock("Specific phrase", false); // 测试未匹配的情况（原正则需要精确匹配）
-    }
-
-    @Test
-       void shouldHandleInvalidRegexSafely() {
-           config.regexFilters = List.of("valid.*", "[invalid[regex");
-           ModConfig.save();
-       
-           // 保存后重新加载配置以应用清理
-           ModConfig.load();
-       
-           assertThat(config.getCompiledPatterns()).hasSize(1);
-           assertShouldBlock("valid123", true);
-           assertShouldBlock("[invalid[regex", false); // 无效正则已被清洗
+       void shouldAllowNonMatchingMessages() {
+           assertShouldBlock("Normal message", false);
+           assertShouldBlock("[Info] Player joined", false);
+           assertShouldBlock("Specificphrase", false); 
        }
+
+@Test
+   void shouldHandleInvalidRegexSafely() {
+       config.regexFilters = List.of("valid.*", "[invalid[regex");
+       ModConfig.save();
+       ModConfig.load(); // 重新加载配置
+       
+       assertThat(config.getCompiledPatterns()).hasSize(1);
+       assertShouldBlock("valid123", true);
+       // 验证清理是否工作
+       assertShouldBlock("[invalid[regex", false); 
+   }
 
     @Test
     void shouldRespectCaseInsensitiveFlag() {
