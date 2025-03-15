@@ -50,14 +50,42 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
 
+      - name: Run Tests
+        id: run-tests
+        run: ./gradlew test --info
+
       - name: Auto-format code
+        if: steps.run-tests.outcome == 'success'
         run: |
           ./gradlew spotlessApply
           git config --global user.name "CI Bot"
           git config --global user.email "ci@example.com"
           git add .
-          git commit -m "Auto-format code [skip ci]" || echo "No formatting changes"
-          git push origin HEAD:dev
+          if git diff-index --quiet HEAD --; then
+            echo "No formatting changes"
+          else
+            git commit -m "Auto-format code [skip ci]"
+            git push origin HEAD:dev
+          fi
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            build/test-results/test/**/*.xml
+            build/reports/tests/test/
+
+      - name: Analyze Test Results
+        uses: dorny/test-reporter@v1
+        if: failure()
+        with:
+          name: Test Failure Report
+          path: build/test-results/test/**/*.xml
+          reporter: java-junit
+          fail-on-error: false
+          list-tests: failed
 
       - name: Build artifact
         run: ./gradlew build
