@@ -22,6 +22,7 @@ public class ModConfigTest {
     void reset() {
         ModConfig.getInstance().enabled = true;
         ModConfig.getInstance().regexFilters.clear();
+        ModConfig.load();
     }
 
     @Test

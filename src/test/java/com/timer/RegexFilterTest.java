@@ -37,16 +37,17 @@ public class RegexFilterTest {
     }
 
     @Test
-    void shouldHandleInvalidRegexSafely() {
-        // 设置包含无效正则的配置
-        config.regexFilters = List.of("valid.*", "[invalid[regex");
-        ModConfig.save(); // 触发清理和预编译
-        
-        // 验证保存后实际生效的正则
-        assertThat(config.getCompiledPatterns()).hasSize(1); // 仅保留valid.*
-        assertShouldBlock("valid123", true);
-        assertShouldBlock("[invalid[regex", false); // 无效正则已被过滤
-    }
+       void shouldHandleInvalidRegexSafely() {
+           config.regexFilters = List.of("valid.*", "[invalid[regex");
+           ModConfig.save();
+       
+           // 保存后重新加载配置以应用清理
+           ModConfig.load();
+       
+           assertThat(config.getCompiledPatterns()).hasSize(1);
+           assertShouldBlock("valid123", true);
+           assertShouldBlock("[invalid[regex", false); // 无效正则已被清洗
+       }
 
     @Test
     void shouldRespectCaseInsensitiveFlag() {

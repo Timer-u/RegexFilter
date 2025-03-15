@@ -72,6 +72,7 @@ public class ModConfig {
             if (loaded.regexFilters == null) {
                 loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters); // 恢复默认
             } else {
+                loaded.regexFilters = new ArrayList<>(loaded.regexFilters); // 转为 ArrayList
                 loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
             }
 
