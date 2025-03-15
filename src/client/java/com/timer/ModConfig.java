@@ -69,12 +69,12 @@ public class ModConfig {
             ModConfig loaded = GSON.fromJson(json, ModConfig.class);
 
             // 字段合法性校验
-            if (loaded.regexFilters == null) {
-                loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters); // 恢复默认
-            } else {
-                loaded.regexFilters = new ArrayList<>(loaded.regexFilters); // 转为 ArrayList
-                loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
-            }
+               if (loaded.regexFilters == null) {
+                   loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
+               } else {
+                   loaded.regexFilters = new ArrayList<>(loaded.regexFilters); // 转为 ArrayList
+                   loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
+               }
 
             INSTANCE = loaded;
             INSTANCE.updateCompiledPatterns(); // 加载后更新缓存

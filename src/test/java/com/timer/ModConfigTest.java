@@ -19,11 +19,9 @@ public class ModConfigTest {
     }
 
     @AfterEach
-    void reset() {
-        ModConfig.getInstance().enabled = true;
-        ModConfig.getInstance().regexFilters.clear();
-        ModConfig.load();
-    }
+       void reset() {
+           ModConfig.load(); 
+       }
 
     @Test
     void load_shouldHandleMissingFile() {
