@@ -76,11 +76,6 @@ public class ModConfig {
                 loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
             }
     
-            // 确保其他字段的默认值
-            if (loaded.enabled == null) {
-                loaded.enabled = true; // 如果使用 Boolean 类型，否则保持原逻辑
-            }
-    
             INSTANCE = loaded;
             INSTANCE.updateCompiledPatterns();
             LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
