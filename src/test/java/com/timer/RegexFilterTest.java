@@ -31,13 +31,9 @@ public class RegexFilterTest {
         ModConfig.load(); // 确保配置在最新状态
         config = ModConfig.getInstance();
         config.enabled = true;
-        config.regexFilters = List.of(
-            "^\\[System\\].*", 
-            ".*(cheat|hack).*", 
-            "(?i)specific phrase"
-        );
+        config.regexFilters = List.of("^\\[System\\].*", ".*(cheat|hack).*", "(?i)specific phrase");
         ModConfig.save();
-         ModConfig.load(); // 应用配置
+        ModConfig.load(); // 应用配置
     }
 
     @Test
@@ -52,12 +48,12 @@ public class RegexFilterTest {
     void shouldAllowNonMatchingMessages() {
         assertShouldBlock("Normal message", false);
         assertShouldBlock("[Info] Player joined", false);
-        assertShouldBlock("Specificphrase", false); 
+        assertShouldBlock("Specificphrase", false);
     }
 
     @AfterEach
     void reset() {
-    // 重置配置到初始状态
+        // 重置配置到初始状态
         ModConfig.getInstance().enabled = true;
         ModConfig.getInstance().regexFilters = new ArrayList<>();
         ModConfig.save();
@@ -70,47 +66,47 @@ public class RegexFilterTest {
         ModConfig.getInstance().regexFilters = List.of("^valid.*", "[invalid[regex"); // 添加 ^ 严格匹配开头
         ModConfig.save();
         ModConfig.load();
-    
+
         // 获取最新实例
         ModConfig config = ModConfig.getInstance();
-    
+
         // 验证正则列表和匹配逻辑
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
-        
+
         // 验证正则表达式
         assertThat(validPattern.pattern()).isEqualTo("^valid.*");
-        
+
         // 确保正则表达式不包含意外标志
         assertThat(validPattern.flags() & Pattern.CASE_INSENSITIVE).isEqualTo(0);
-    
+
         // 验证有效正则匹配正确字符串
-        assertThat(validPattern.matcher("valid123").find()).isTrue(); 
-        assertThat(validPattern.matcher("[invalid[regex").find()).isFalse(); 
-    
+        assertThat(validPattern.matcher("valid123").find()).isTrue();
+        assertThat(validPattern.matcher("[invalid[regex").find()).isFalse();
+
         // 更新断言以反映正确行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
-    
+
     @Test
-void shouldRespectCaseInsensitiveFlag() {
-    ModConfig.getInstance().regexFilters = List.of("(?i)casetest");
-    ModConfig.save();
-    ModConfig.load(); // 重新加载配置
+    void shouldRespectCaseInsensitiveFlag() {
+        ModConfig.getInstance().regexFilters = List.of("(?i)casetest");
+        ModConfig.save();
+        ModConfig.load(); // 重新加载配置
 
-    // 验证编译后的正则表达式标志
-    List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
-    assertThat(patterns).hasSize(1);
-    Pattern pattern = patterns.get(0);
-    assertThat(pattern.flags() & Pattern.CASE_INSENSITIVE).isNotEqualTo(0);
+        // 验证编译后的正则表达式标志
+        List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
+        assertThat(patterns).hasSize(1);
+        Pattern pattern = patterns.get(0);
+        assertThat(pattern.flags() & Pattern.CASE_INSENSITIVE).isNotEqualTo(0);
 
-    // 测试不同大小写的消息
-    assertShouldBlock("CASETEST", true);
-    assertShouldBlock("casetest", true);
-    assertShouldBlock("CaseTest", true);
-    assertShouldBlock("CaSeTeSt", true);
-}
+        // 测试不同大小写的消息
+        assertShouldBlock("CASETEST", true);
+        assertShouldBlock("casetest", true);
+        assertShouldBlock("CaseTest", true);
+        assertShouldBlock("CaSeTeSt", true);
+    }
 
     private void assertShouldBlock(String message, boolean expected) {
         boolean actual = RegexFilterClient.shouldAllowMessage(Text.of(message));

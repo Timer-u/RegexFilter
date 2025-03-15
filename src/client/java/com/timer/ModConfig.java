@@ -37,6 +37,7 @@ public class ModConfig {
     public static void setConfigPathForTest(Path path) {
         CONFIG_PATH = path;
     }
+
     // 预编译的正则表达式缓存
     private transient List<Pattern> compiledPatterns = new ArrayList<>();
 
@@ -44,7 +45,7 @@ public class ModConfig {
     void updateCompiledPatterns() {
         compiledPatterns.clear();
         if (regexFilters == null) return;
-        
+
         for (String regex : regexFilters) {
             try {
                 compiledPatterns.add(Pattern.compile(regex));
@@ -64,16 +65,16 @@ public class ModConfig {
                 save();
                 return;
             }
-    
+
             String json = Files.readString(CONFIG_PATH);
             ModConfig loaded = GSON.fromJson(json, ModConfig.class);
-    
+
             // 处理 loaded 为 null 的情况
             if (loaded == null) {
                 LOGGER.error("Config file is invalid, using default configuration");
                 loaded = new ModConfig();
             }
-    
+
             // 确保 regexFilters 不为 null
             if (loaded.regexFilters == null) {
                 loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
@@ -81,7 +82,7 @@ public class ModConfig {
                 loaded.regexFilters = new ArrayList<>(loaded.regexFilters);
                 loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
             }
-    
+
             INSTANCE = loaded;
             INSTANCE.updateCompiledPatterns();
             LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
@@ -96,20 +97,21 @@ public class ModConfig {
     public static void save() {
         // 清理无效的正则表达式
         List<String> cleanList = new ArrayList<>(INSTANCE.regexFilters);
-        cleanList.removeIf(str -> {
-            if (str == null || str.trim().isEmpty()) return true;
-            try {
-                Pattern.compile(str); // 仅用于验证，不重复编译
-                return false;
-            } catch (PatternSyntaxException e) {
-                LOGGER.warn("Removing invalid pattern: {}", str);
-                return true;
-            }
-        });
-    
+        cleanList.removeIf(
+                str -> {
+                    if (str == null || str.trim().isEmpty()) return true;
+                    try {
+                        Pattern.compile(str); // 仅用于验证，不重复编译
+                        return false;
+                    } catch (PatternSyntaxException e) {
+                        LOGGER.warn("Removing invalid pattern: {}", str);
+                        return true;
+                    }
+                });
+
         INSTANCE.regexFilters = cleanList;
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
-    
+
         try {
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);

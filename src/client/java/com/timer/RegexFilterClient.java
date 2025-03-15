@@ -5,7 +5,6 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -37,8 +36,10 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
 
                     for (Pattern pattern : patterns) {
                         if (pattern.matcher(rawMessage).find()) {
-                            LOGGER.debug("[Filter] Blocked message matching '{}': {}",
-                                    pattern.pattern(), rawMessage);
+                            LOGGER.debug(
+                                    "[Filter] Blocked message matching '{}': {}",
+                                    pattern.pattern(),
+                                    rawMessage);
                             return false;
                         }
                     }

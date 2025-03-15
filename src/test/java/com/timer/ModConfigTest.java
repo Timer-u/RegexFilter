@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import org.junit.jupiter.api.*;
 import java.util.regex.Pattern;
+import org.junit.jupiter.api.*;
 
 public class ModConfigTest {
     private static Path tempConfig;
@@ -19,9 +19,9 @@ public class ModConfigTest {
     }
 
     @AfterEach
-       void reset() {
-           ModConfig.load(); 
-       }
+    void reset() {
+        ModConfig.load();
+    }
 
     @Test
     void load_shouldHandleMissingFile() {
@@ -53,7 +53,7 @@ public class ModConfigTest {
     void shouldCompileValidPatterns() {
         ModConfig.getInstance().regexFilters = List.of("valid.*", "[a-z]+");
         ModConfig.getInstance().updateCompiledPatterns();
-        
+
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
         assertThat(compiled).hasSize(2);
         assertThat(compiled.get(0).pattern()).isEqualTo("valid.*");
@@ -63,7 +63,7 @@ public class ModConfigTest {
     void shouldSkipInvalidPatterns() {
         ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid[");
         ModConfig.getInstance().updateCompiledPatterns();
-        
+
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
         assertThat(compiled).hasSize(1);
     }
