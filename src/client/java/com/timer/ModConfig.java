@@ -36,6 +36,22 @@ public class ModConfig {
     public static void setConfigPathForTest(Path path) {
         CONFIG_PATH = path;
     }
+    // 预编译的正则表达式缓存
+    private List<Pattern> compiledPatterns = new ArrayList<>();
+
+    // 更新预编译的正则表达式
+    private void updateCompiledPatterns() {
+        compiledPatterns.clear();
+        if (regexFilters == null) return;
+        
+        for (String regex : regexFilters) {
+            try {
+                compiledPatterns.add(Pattern.compile(regex));
+            } catch (PatternSyntaxException e) {
+                LOGGER.warn("Skipping invalid pattern during compilation: {}", regex);
+            }
+        }
+    }
 
     // 加载配置（增强null值处理）
     public static void load() {
@@ -59,36 +75,45 @@ public class ModConfig {
             }
 
             INSTANCE = loaded;
-            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.regexFilters.size());
-        } catch (IOException | JsonSyntaxException e) { // 同时捕获 IO 和 JSON 解析异常
+            INSTANCE.updateCompiledPatterns(); // 加载后更新缓存
+            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size()); // 同时捕获 IO 和 JSON 解析异常
+
+        } catch (IOException | JsonSyntaxException e) {
             LOGGER.error("Config load failed", e);
             INSTANCE = new ModConfig(); // 恢复默认配置
+            INSTANCE.updateCompiledPatterns();
         }
     }
 
     // 保存配置
     public static void save() {
-        // 数据清洗
+        // 清理无效的正则表达式
         List<String> cleanList = new ArrayList<>(INSTANCE.regexFilters);
-        cleanList.removeIf(
-                str -> {
-                    if (str == null || str.trim().isEmpty()) return true;
-                    try {
-                        Pattern.compile(str);
-                        return false;
-                    } catch (PatternSyntaxException e) {
-                        LOGGER.warn("Removing invalid pattern: {}", str);
-                        return true;
-                    }
-                });
+        cleanList.removeIf(str -> {
+            if (str == null || str.trim().isEmpty()) return true;
+            try {
+                Pattern.compile(str); // 仅用于验证，不重复编译
+                return false;
+            } catch (PatternSyntaxException e) {
+                LOGGER.warn("Removing invalid pattern: {}", str);
+                return true;
+            }
+        });
 
         INSTANCE.regexFilters = cleanList;
+        INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
 
         try {
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);
+            LOGGER.info("Config saved with {} patterns", INSTANCE.compiledPatterns.size());
         } catch (IOException e) {
             LOGGER.error("Config save failed", e);
         }
+    }
+
+    // 获取只读的预编译正则列表
+    public List<Pattern> getCompiledPatterns() {
+        return Collections.unmodifiableList(compiledPatterns);
     }
 }

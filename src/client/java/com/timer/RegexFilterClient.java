@@ -29,24 +29,17 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
                     if (!ModConfig.getInstance().enabled) return true;
 
                     String rawMessage = message.getString();
-                    List<String> regexList = ModConfig.getInstance().regexFilters;
+                    List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
 
-                    // 空列表直接放行
-                    if (regexList == null || regexList.isEmpty()) {
+                    if (patterns.isEmpty()) {
                         return true;
                     }
 
-                    for (String regex : regexList) {
-                        try {
-                            if (Pattern.compile(regex).matcher(rawMessage).find()) {
-                                LOGGER.debug(
-                                        "[Filter] Blocked message matching '{}': {}",
-                                        regex,
-                                        rawMessage);
-                                return false;
-                            }
-                        } catch (PatternSyntaxException e) {
-                            LOGGER.error("[Filter] Invalid regex pattern: {}", regex, e);
+                    for (Pattern pattern : patterns) {
+                        if (pattern.matcher(rawMessage).find()) {
+                            LOGGER.debug("[Filter] Blocked message matching '{}': {}",
+                                    pattern.pattern(), rawMessage);
+                            return false;
                         }
                     }
                     return true;
@@ -64,19 +57,15 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
         if (!ModConfig.getInstance().enabled) return true;
 
         String rawMessage = message.getString();
-        List<String> regexList = ModConfig.getInstance().regexFilters;
+        List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
 
-        if (regexList == null || regexList.isEmpty()) {
+        if (patterns.isEmpty()) {
             return true;
         }
 
-        for (String regex : regexList) {
-            try {
-                if (Pattern.compile(regex).matcher(rawMessage).find()) {
-                    return false;
-                }
-            } catch (PatternSyntaxException e) {
-                LOGGER.error("Invalid regex pattern: {}", regex);
+        for (Pattern pattern : patterns) {
+            if (pattern.matcher(rawMessage).find()) {
+                return false;
             }
         }
         return true;

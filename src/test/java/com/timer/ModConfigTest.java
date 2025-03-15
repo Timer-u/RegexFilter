@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.*;
+import java.util.regex.Pattern;
 
 public class ModConfigTest {
     private static Path tempConfig;
@@ -47,5 +48,24 @@ public class ModConfigTest {
 
         ModConfig.load();
         assertThat(ModConfig.getInstance().enabled).isTrue(); // 使用默认值
+    }
+
+    @Test
+    void shouldCompileValidPatterns() {
+        ModConfig.getInstance().regexFilters = List.of("valid.*", "[a-z]+");
+        ModConfig.getInstance().updateCompiledPatterns();
+        
+        List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
+        assertThat(compiled).hasSize(2);
+        assertThat(compiled.get(0).pattern()).isEqualTo("valid.*");
+    }
+
+    @Test
+    void shouldSkipInvalidPatterns() {
+        ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid[");
+        ModConfig.getInstance().updateCompiledPatterns();
+        
+        List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
+        assertThat(compiled).hasSize(1);
     }
 }
