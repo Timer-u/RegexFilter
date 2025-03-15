@@ -68,6 +68,12 @@ public class ModConfig {
             String json = Files.readString(CONFIG_PATH);
             ModConfig loaded = GSON.fromJson(json, ModConfig.class);
     
+            // 处理 loaded 为 null 的情况
+            if (loaded == null) {
+                LOGGER.error("Config file is invalid, using default configuration");
+                loaded = new ModConfig();
+            }
+    
             // 确保 regexFilters 不为 null
             if (loaded.regexFilters == null) {
                 loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);

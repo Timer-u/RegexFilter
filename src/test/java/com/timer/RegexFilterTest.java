@@ -89,15 +89,23 @@ public class RegexFilterTest {
     }
 
     @Test
-    void shouldRespectCaseInsensitiveFlag() {
-        // 测试大小写不敏感特性
-        config.regexFilters = List.of("(?i)casetest");
-        ModConfig.save();
-        
-        assertShouldBlock("CASETEST", true);
-        assertShouldBlock("casetest", true);
-        assertShouldBlock("CaseTest", true);
-    }
+void shouldRespectCaseInsensitiveFlag() {
+    ModConfig.getInstance().regexFilters = List.of("(?i)casetest");
+    ModConfig.save();
+    ModConfig.load(); // 重新加载配置
+
+    // 验证编译后的正则表达式标志
+    List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
+    assertThat(patterns).hasSize(1);
+    Pattern pattern = patterns.get(0);
+    assertThat(pattern.flags() & Pattern.CASE_INSENSITIVE).isNotEqualTo(0);
+
+    // 测试不同大小写的消息
+    assertShouldBlock("CASETEST", true);
+    assertShouldBlock("casetest", true);
+    assertShouldBlock("CaseTest", true);
+    assertShouldBlock("CaSeTeSt", true);
+}
 
     private void assertShouldBlock(String message, boolean expected) {
         boolean actual = RegexFilterClient.shouldAllowMessage(Text.of(message));
