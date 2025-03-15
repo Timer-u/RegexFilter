@@ -38,7 +38,7 @@ public class ModConfig {
         CONFIG_PATH = path;
     }
     // 预编译的正则表达式缓存
-    private List<Pattern> compiledPatterns = new ArrayList<>();
+    private transient List<Pattern> compiledPatterns = new ArrayList<>();
 
     // 更新预编译的正则表达式
     void updateCompiledPatterns() {
