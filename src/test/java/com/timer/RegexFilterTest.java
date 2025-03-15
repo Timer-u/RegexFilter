@@ -27,6 +27,7 @@ public class RegexFilterTest {
 
     @BeforeEach
     void setup() {
+        ModConfig.load(); // 确保配置在最新状态
         config = ModConfig.getInstance();
         config.enabled = true;
         config.regexFilters = List.of(
@@ -35,6 +36,7 @@ public class RegexFilterTest {
             "(?i)specific phrase"
         );
         ModConfig.save();
+         ModConfig.load(); // 应用配置
     }
 
     @Test
@@ -54,9 +56,9 @@ public class RegexFilterTest {
 
     @AfterEach
     void reset() {
-        // 重置配置到默认状态
+    // 重置配置到初始状态
         ModConfig.getInstance().enabled = true;
-        ModConfig.getInstance().regexFilters.clear();
+        ModConfig.getInstance().regexFilters = new ArrayList<>();
         ModConfig.save();
         ModConfig.load();
     }
@@ -74,9 +76,13 @@ public class RegexFilterTest {
     // 验证正则列表和匹配逻辑
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
-        assertThat(validPattern.matcher("[invalid[regex").find()).isFalse();
-
-    // 断言消息是否被屏蔽
+    
+    // 添加诊断日志
+        System.out.println("Testing pattern: " + validPattern.pattern());
+        boolean matches = validPattern.matcher("[invalid[regex").find();
+        System.out.println("Pattern matches '[invalid[regex': " + matches);
+    
+        assertThat(matches).isFalse(); // 明确断言不匹配
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
