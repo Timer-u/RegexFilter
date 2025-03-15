@@ -2,11 +2,21 @@
 一个基于 Fabric 的 Minecraft 模组，支持通过正则表达式屏蔽聊天消息，提供基于Cloth Config API 的可视化配置界面。
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+## 依赖项
 
-## 配置指南
-1. 进入 Minecraft 游戏主菜单。
-2. 点击 `Mods` → 找到本模组 → 点击齿轮图标。
-3. 调整以下设置：
+| 依赖               | 类型  | 版本         | 链接                                                                                                                               |
+| ---------------- | --- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Minecraft        | 必须  | 1.21       | [Official Website](https://www.minecraft.net/)                                                                                   |
+| Fabric Loader    | 必须  | >=0.15.0   | [Github](https://github.com/FabricMC/fabric-loader)                                                                              |
+| Fabric API       | 必须  | 任意         | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api) &#124; [Modrinth](https://modrinth.com/mod/fabric-api)     |
+| Cloth Config API | 必须  | >=15.0.127 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/cloth-config) &#124; [Modrinth](https://modrinth.com/mod/cloth-config) |
+| Mod Menu         | 必须  | >=11.0.0   | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/modmenu) &#124; [Modrinth](https://modrinth.com/mod/modmenu)           |
+ 
+## 使用指南
+1. 安装所有依赖项
+2. 进入 Minecraft 游戏主菜单。
+3. 点击 `Mods` → 找到本模组 → 点击mod图标。
+4. 调整以下设置：
    - `启用模组`：总开关。
    - `正则列表`：输入要屏蔽的正则表达式。
 
@@ -30,9 +40,4 @@
 - **无担保条款**  
   作者不对代码的适用性及稳定性作任何担保，使用风险由使用者自行承担。
 
-完整协议内容请参阅：[GPL v3.0 官方解释](https://www.gnu.org/licenses/gpl-3.0.html)
-
 ---
-
-**合规性提示**：  
-若您将本模组整合到其他项目中，需确保整个项目遵循 GPL v3.0 协议。商业用途前请仔细阅读协议条款。
