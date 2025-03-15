@@ -106,10 +106,10 @@ public class ModConfig {
                 return true;
             }
         });
-
+    
         INSTANCE.regexFilters = cleanList;
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
-
+    
         try {
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);

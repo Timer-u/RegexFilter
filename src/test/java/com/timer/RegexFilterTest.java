@@ -88,7 +88,6 @@ public class RegexFilterTest {
         assertThat(validPattern.matcher("valid123").find()).isTrue(); 
         assertThat(validPattern.matcher("[invalid[regex").find()).isFalse(); 
     
-        // 更新断言以反映正确行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
