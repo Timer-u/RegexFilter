@@ -54,35 +54,39 @@ public class ModConfig {
         }
     }
 
-    // 加载配置（增强null值处理）
+    // 加载配置
     public static void load() {
         LOGGER.info("Loading config...");
         try {
             if (!Files.exists(CONFIG_PATH)) {
                 LOGGER.info("Creating default config");
-                INSTANCE = new ModConfig(); // 使用类默认值
+                INSTANCE = new ModConfig();
                 save();
                 return;
             }
-
+    
             String json = Files.readString(CONFIG_PATH);
             ModConfig loaded = GSON.fromJson(json, ModConfig.class);
-
-            // 字段合法性校验
-               if (loaded.regexFilters == null) {
-                   loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
-               } else {
-                   loaded.regexFilters = new ArrayList<>(loaded.regexFilters); // 转为 ArrayList
-                   loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
-               }
-
+    
+            // 确保 regexFilters 不为 null
+            if (loaded.regexFilters == null) {
+                loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
+            } else {
+                loaded.regexFilters = new ArrayList<>(loaded.regexFilters);
+                loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
+            }
+    
+            // 确保其他字段的默认值
+            if (loaded.enabled == null) {
+                loaded.enabled = true; // 如果使用 Boolean 类型，否则保持原逻辑
+            }
+    
             INSTANCE = loaded;
-            INSTANCE.updateCompiledPatterns(); // 加载后更新缓存
-            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size()); // 同时捕获 IO 和 JSON 解析异常
-
+            INSTANCE.updateCompiledPatterns();
+            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
         } catch (IOException | JsonSyntaxException e) {
             LOGGER.error("Config load failed", e);
-            INSTANCE = new ModConfig(); // 恢复默认配置
+            INSTANCE = new ModConfig();
             INSTANCE.updateCompiledPatterns();
         }
     }

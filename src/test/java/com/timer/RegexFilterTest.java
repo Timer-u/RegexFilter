@@ -91,7 +91,7 @@ public class RegexFilterTest {
     @Test
     void shouldRespectCaseInsensitiveFlag() {
         // 测试大小写不敏感特性
-        config.regexFilters = List.of("(?i)caseTest");
+        config.regexFilters = List.of("(?i)casetest");
         ModConfig.save();
         
         assertShouldBlock("CASETEST", true);
