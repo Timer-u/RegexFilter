@@ -59,9 +59,9 @@ public class ModConfig {
 
             INSTANCE = loaded;
             LOGGER.info("Loaded {} valid regex patterns", INSTANCE.regexFilters.size());
-        } catch (IOException e) {
+        } catch (IOException | JsonSyntaxException e) { // 同时捕获 IO 和 JSON 解析异常
             LOGGER.error("Config load failed", e);
-            INSTANCE = new ModConfig(); // 故障时回退默认
+            INSTANCE = new ModConfig(); // 恢复默认配置
         }
     }
 

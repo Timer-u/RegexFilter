@@ -15,7 +15,7 @@ public class RegexFilterTest {
         config.regexFilters = List.of(
             "^\\[System\\].*", 
             ".*(cheat|hack).*",
-            "specific phrase"
+            "(?i)specific phrase" // 添加不区分大小写标记
         );
     }
     
