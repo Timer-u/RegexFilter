@@ -41,7 +41,7 @@ public class ModConfig {
     private List<Pattern> compiledPatterns = new ArrayList<>();
 
     // 更新预编译的正则表达式
-    private void updateCompiledPatterns() {
+    void updateCompiledPatterns() {
         compiledPatterns.clear();
         if (regexFilters == null) return;
         
