@@ -1,0 +1,121 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    paths:  
+      - 'src/**'
+      - '*.gradle'
+      - 'gradle.properties'
+      - '.github/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  format-and-build:
+    name: Format & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.ref == 'refs/heads/dev'
+    env:
+      JAVA_VERSION: 21
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Fix permissions
+        run: chmod +x gradlew
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
+      - name: Run Tests
+        id: run-tests
+        run: ./gradlew test --info
+
+      - name: Auto-format code
+        if: steps.run-tests.outcome == 'success'
+        run: |
+          ./gradlew spotlessApply
+          git config --global user.name "CI Bot"
+          git config --global user.email "ci@example.com"
+          git add .
+          if git diff-index --quiet HEAD --; then
+            echo "No formatting changes"
+          else
+            git commit -m "Auto-format code [skip ci]"
+            git push origin HEAD:dev
+          fi
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            build/test-results/test/**/*.xml
+            build/reports/tests/test/
+      - name: Analyze Test Results
+        uses: dorny/test-reporter@v1
+        if: failure()
+        with:
+          name: Test Failure Report
+          path: build/test-results/test/**/*.xml
+          reporter: java-junit
+          fail-on-error: false
+          list-tests: failed
+
+      - name: Build artifact
+        run: ./gradlew build
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-package
+          path: build/libs/*.jar
+
+  release:
+    name: Publish Release
+    needs: format-and-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mod-package
+          path: release/
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ format('{0:%Y%m%d}-{1}', github.event.head_commit.timestamp, github.run_number) }}"
+          files: release/*.jar
+          draft: true
+          generate_release_notes: true
+          

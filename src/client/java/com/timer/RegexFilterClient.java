@@ -2,33 +2,73 @@ package com.timer;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.regex.Pattern;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import java.util.regex.Pattern;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.text.Text;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
+    private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
+
     @Override
     public void onInitializeClient() {
-        // 初始化时加载配置文件
+        // 设置日志目录系统属性
+        Path logDir = FabricLoader.getInstance().getGameDir().resolve("logs");
+        System.setProperty("regexfilter.logdir", logDir.toString());
+
         ModConfig.load();
 
-        // 监听聊天消息并过滤
-        ClientReceiveMessageEvents.ALLOW_GAME.register((message, isActionBar) -> {
-            if (!ModConfig.enabled) return true;
+        ClientReceiveMessageEvents.ALLOW_GAME.register(
+                (message, isActionBar) -> {
+                    if (!ModConfig.getInstance().enabled) return true;
 
-            String rawMessage = message.getString();
-            for (String regex : ModConfig.regexFilters) {
-                if (Pattern.compile(regex).matcher(rawMessage).find()) {
-                    return false; // 拦截消息
-                }
-            }
-            return true;
-        });
+                    String rawMessage = message.getString();
+                    List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
+
+                    if (patterns.isEmpty()) {
+                        return true;
+                    }
+
+                    for (Pattern pattern : patterns) {
+                        if (pattern.matcher(rawMessage).find()) {
+                            LOGGER.debug(
+                                    "[Filter] Blocked message matching '{}': {}",
+                                    pattern.pattern(),
+                                    rawMessage);
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+        LOGGER.info("RegexFilter initialized");
     }
 
-    // ModMenu 接口：返回配置界面
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
         return ModConfigScreen::createConfigScreen;
+    }
+
+    // 测试用方法
+    static boolean shouldAllowMessage(Text message) {
+        if (!ModConfig.getInstance().enabled) return true;
+
+        String rawMessage = message.getString();
+        List<Pattern> patterns = ModConfig.getInstance().getCompiledPatterns();
+
+        if (patterns.isEmpty()) {
+            return true;
+        }
+
+        for (Pattern pattern : patterns) {
+            if (pattern.matcher(rawMessage).find()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

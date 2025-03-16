@@ -24,3 +24,7 @@ replay_pid*
 
 # back up files
 *.bak
+
+# Gradle
+.gradle/
+build/
