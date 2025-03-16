@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - dev
-    paths:  
+    paths:
       - 'src/**'
       - '*.gradle'
       - 'gradle.properties'
+      - '.github/**'
   pull_request:
     types: [closed]
     branches:
@@ -49,6 +50,7 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
 
+      # Dev分支：格式化+测试
       - name: Run Tests and Format (dev only)
         if: github.ref == 'refs/heads/dev'
         run: |
@@ -61,8 +63,9 @@ jobs:
             git push origin HEAD:dev
           fi
 
+      # Main分支合并：仅构建
       - name: Build Only (main)
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        if: github.event.pull_request.merged && github.base_ref == 'refs/heads/main'
         run: ./gradlew build
 
       - name: Extract mod info
@@ -73,6 +76,7 @@ jobs:
 
       - name: Upload build
         uses: actions/upload-artifact@v4
+        if: always()  # 确保合并main时也能上传
         with:
           name: ${{ steps.extract-mod-info.outputs.MOD_NAME }}-${{ steps.extract-mod-info.outputs.MOD_VERSION }}.jar
           path: build/libs/${{ steps.extract-mod-info.outputs.MOD_NAME }}-${{ steps.extract-mod-info.outputs.MOD_VERSION }}.jar
@@ -80,7 +84,7 @@ jobs:
   release:
     name: Create Draft Release
     needs: format-and-build
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged && github.base_ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release
     permissions:
