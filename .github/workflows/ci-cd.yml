@@ -4,32 +4,31 @@ on:
   push:
     branches:
       - dev
-      - main
     paths:  
       - 'src/**'
       - '*.gradle'
       - 'gradle.properties'
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 jobs:
   format-and-build:
     name: Format & Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: github.ref == 'refs/heads/dev'
     env:
       JAVA_VERSION: 21
       GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+    outputs:
+      mod_name: ${{ steps.extract-mod-info.outputs.MOD_NAME }}
+      mod_version: ${{ steps.extract-mod-info.outputs.MOD_VERSION }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: dev
           fetch-depth: 0
 
       - name: Fix permissions
@@ -50,58 +49,40 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
 
-      - name: Run Tests
-        id: run-tests
-        run: ./gradlew test --info
-
-      - name: Auto-format code
-        if: steps.run-tests.outcome == 'success'
+      - name: Run Tests and Format (dev only)
+        if: github.ref == 'refs/heads/dev'
         run: |
-          ./gradlew spotlessApply
+          ./gradlew test spotlessApply --info
           git config --global user.name "CI Bot"
           git config --global user.email "ci@example.com"
           git add .
-          if git diff-index --quiet HEAD --; then
-            echo "No formatting changes"
-          else
-            git commit -m "Auto-format code [skip ci]"
+          if ! git diff-index --quiet HEAD --; then
+            git commit -m "Auto-format code [skip ci] [skip actions]"
             git push origin HEAD:dev
           fi
 
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            build/test-results/test/**/*.xml
-            build/reports/tests/test/
-
-      - name: Analyze Test Results
-        uses: dorny/test-reporter@v1
-        if: failure()
-        with:
-          name: Test Failure Report
-          path: build/test-results/test/**/*.xml
-          reporter: java-junit
-          fail-on-error: false
-          list-tests: failed
-
-      - name: Build artifact
+      - name: Build Only (main)
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         run: ./gradlew build
+
+      - name: Extract mod info
+        id: extract-mod-info
+        run: |
+          echo "MOD_VERSION=$(grep 'mod_version' gradle.properties | cut -d'=' -f2)" >> $GITHUB_OUTPUT
+          echo "MOD_NAME=$(grep 'archives_base_name' gradle.properties | cut -d'=' -f2)" >> $GITHUB_OUTPUT
 
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
-          name: mod-package
-          path: build/libs/*.jar
+          name: ${{ steps.extract-mod-info.outputs.MOD_NAME }}-${{ steps.extract-mod-info.outputs.MOD_VERSION }}.jar
+          path: build/libs/${{ steps.extract-mod-info.outputs.MOD_NAME }}-${{ steps.extract-mod-info.outputs.MOD_VERSION }}.jar
 
   release:
-    name: Publish Release
+    name: Create Draft Release
     needs: format-and-build
-    if: github.ref == 'refs/heads/main'
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    environment: production
+    environment: release
     permissions:
       contents: write
 
@@ -109,14 +90,14 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: mod-package
+          name: ${{ needs.format-and-build.outputs.mod_name }}-${{ needs.format-and-build.outputs.mod_version }}.jar
           path: release/
 
-      - name: Create release
+      - name: Create Draft Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v${{ format('{0:%Y%m%d}-{1}', github.event.head_commit.timestamp, github.run_number) }}"
+          tag_name: "v${{ needs.format-and-build.outputs.mod_version }}"
           files: release/*.jar
-          draft: false
+          draft: true
           generate_release_notes: true
-          discussion_category_name: "Releases"
+          
