@@ -72,16 +72,16 @@ jobs:
           echo "MOD_VERSION=$(grep 'mod_version' gradle.properties | cut -d'=' -f2)" >> $GITHUB_OUTPUT
           echo "MOD_NAME=$(grep 'archives_base_name' gradle.properties | cut -d'=' -f2)" >> $GITHUB_OUTPUT
 
-         - name: List build artifacts
-           run: ls -lR build/
+      - name: List build artifacts
+        run: ls -lR build/
 
-         - name: Upload artifacts
-           uses: actions/upload-artifact@v4
-           with:
-             name: build-outputs
-             path: |
-               build/libs/*.jar
-               build/packages/*.zip
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-outputs
+          path: |
+            build/libs/*.jar
+            build/packages/*.zip
 
   release:
     name: Create Draft Release
