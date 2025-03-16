@@ -49,8 +49,7 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-
-      # Dev分支：格式化+测试
+      
       - name: Run Tests and Format (dev only)
         if: github.ref == 'refs/heads/dev'
         run: |
@@ -63,7 +62,6 @@ jobs:
             git push origin HEAD:dev
           fi
 
-      # Main分支合并：仅构建
       - name: Build Only (main)
         if: github.event.pull_request.merged && github.base_ref == 'refs/heads/main'
         run: ./gradlew build
@@ -74,11 +72,9 @@ jobs:
           echo "MOD_VERSION=$(grep 'mod_version' gradle.properties | cut -d'=' -f2)" >> $GITHUB_OUTPUT
           echo "MOD_NAME=$(grep 'archives_base_name' gradle.properties | cut -d'=' -f2)" >> $GITHUB_OUTPUT
 
-         # 列出构建产物（调试用）
          - name: List build artifacts
            run: ls -lR build/
 
-         # 上传
          - name: Upload artifacts
            uses: actions/upload-artifact@v4
            with:
