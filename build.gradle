@@ -131,14 +131,15 @@ spotless {
         endWithNewline()
     }
 
-    // 格式化 json 文件
+    // 格式化 JSON 文件
     format 'json', {
         target 'src/**/*.json', '*.json'
-        json()
+        json {
             indentWithSpaces(2)
+        }
     }
 
-    // 格式化 xml 文件
+    // 格式化 XML 文件
     format 'xml', {
         target 'src/**/*.xml', '*.xml'
         eclipseWtp('xml').configFile('.spotless/xml.prefs')
