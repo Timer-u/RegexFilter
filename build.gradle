@@ -129,5 +129,15 @@ spotless {
         indentWithSpaces(4)  // 使用 4 个空格缩进
         trimTrailingWhitespace()  // 去除行尾空格
         endWithNewline()  // 文件以换行符结尾
+    // 格式化 json 文件
+    format 'json', {
+     target 'src/**/*.json', '*.json'
+     simple().indentWithSpaces(2)
     }
-}
+    //格式化 xml 文件
+    format 'xml', {
+     target 'src/**/*.xml', '*.xml'
+     eclipseWtp('xml').configFile('.spotless/xml.prefs')
+    }
+    }
+    
