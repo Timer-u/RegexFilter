@@ -135,7 +135,8 @@ spotless {
     format 'json', {
         target 'src/**/*.json', '*.json'
         json {
-            indentWithSpaces(2)
+            target 'src/**/*.json', '*.json'
+            simple().indentWithSpaces(2)
         }
     }
 
