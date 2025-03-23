@@ -116,28 +116,30 @@ publishing {
 spotless {
     // 格式化 Java 文件
     java {
-        target "src/**/*.java"  // 指定 Java 文件路径
-        googleJavaFormat("1.19.2").aosp()  // 使用 Google Java 格式
-        removeUnusedImports()  // 移除未使用的导入
-        trimTrailingWhitespace()  // 去除行尾空格
-        endWithNewline()  // 文件以换行符结尾
+        target "src/**/*.java"
+        googleJavaFormat("1.19.2").aosp()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 
     // 格式化 Gradle 文件
     format 'gradle', {
-        target '*.gradle', 'gradle.properties'  // 指定 Gradle 文件路径
-        indentWithSpaces(4)  // 使用 4 个空格缩进
-        trimTrailingWhitespace()  // 去除行尾空格
-        endWithNewline()  // 文件以换行符结尾
+        target '*.gradle', 'gradle.properties'
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
     // 格式化 json 文件
     format 'json', {
-     target 'src/**/*.json', '*.json'
-     simple().indentWithSpaces(2)
+        target 'src/**/*.json', '*.json'
+        simple().indentWithSpaces(2)
     }
-    //格式化 xml 文件
+
+    // 格式化 xml 文件
     format 'xml', {
-     target 'src/**/*.xml', '*.xml'
-     eclipseWtp('xml').configFile('.spotless/xml.prefs')
+        target 'src/**/*.xml', '*.xml'
+        eclipseWtp('xml').configFile('.spotless/xml.prefs')
     }
-    }
-    
+}
