@@ -1,7 +1,7 @@
 {
   "text.cloth-config.off": "已禁用",
   "option.regex_list": "正则表达式列表",
-  "modmenu.nameTranslation.regexfilter": "正则过滤器",
+  "modmenu.nameTranslation.regexfilter": "RegexFilter",
   "text.cloth-config.on": "已启用",
   "category.general": "通用设置",
   "option.enabled": "启用模组",
