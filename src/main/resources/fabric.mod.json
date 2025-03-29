@@ -1,36 +1,30 @@
 {
   "schemaVersion": 1,
-  "id": "regexfilter",
-  "version": "1.1.0",
-  "name": "RegexFilter",
-  "description": "Advanced chat filtering with regex patterns | 基于正则表达式的聊天过滤器",
-  "authors": [
-    "Timer"
-  ],
-  "contact": {
-    "homepage": "https://github.com/Timer-keeper/RegexFilter",
-    "sources": "https://github.com/Timer-keeper/RegexFilter",
-    "issues": "https://github.com/Timer-keeper/RegexFilter/issues"
-  },
-  "license": "GPL-3.0-only",
-  "icon": "assets/regexfilter/icon.png",
-  "environment": "client",
-  "entrypoints": {
-    "client": ["com.timer.RegexFilterClient"],
-    "modmenu": ["com.timer.RegexFilterClient"]
-  },
   "depends": {
-    "fabricloader": ">=0.15.0",
     "minecraft": "1.21.x",
-    "java": ">=17",
     "fabric-api": "*",
-    "cloth-config": ">=15.0.127",
-    "modmenu": ">=11.0.0"
+    "java": ">=17",
+    "modmenu": ">=11.0.0",
+    "fabricloader": ">=0.15.0",
+    "cloth-config": ">=15.0.127"
   },
+  "custom": {"modmenu": {}},
+  "icon": "assets/regexfilter/icon.png",
+  "description": "Advanced chat filtering with regex patterns | 基于正则表达式的聊天过滤器",
+  "version": "1.1.0",
+  "license": "GPL-3.0-only",
   "suggests": {},
-  "custom": {
-    "modmenu": {
-
-    }
-  }
+  "environment": "client",
+  "contact": {
+    "sources": "https://github.com/Timer-keeper/RegexFilter",
+    "issues": "https://github.com/Timer-keeper/RegexFilter/issues",
+    "homepage": "https://github.com/Timer-keeper/RegexFilter"
+  },
+  "name": "RegexFilter",
+  "entrypoints": {
+    "modmenu": ["com.timer.RegexFilterClient"],
+    "client": ["com.timer.RegexFilterClient"]
+  },
+  "id": "regexfilter",
+  "authors": ["Timer"]
 }
