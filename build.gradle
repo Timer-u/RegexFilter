@@ -132,12 +132,9 @@ spotless {
     }
 
     // 格式化 JSON 文件
-    format 'json', {
-        target 'src/**/*.json', '*.json'
-        json {
-            target 'src/**/*.json', '*.json'
-            simple().indentWithSpaces(2)
-        }
+    json {
+        target 'src/**/*.json', '*.json'  // 合并目标路径
+        simple().indentWithSpaces(2)     // 指定缩进 2 空格
     }
 
     // 格式化 XML 文件
