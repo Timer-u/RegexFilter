@@ -54,7 +54,7 @@ jobs:
 
       - name: Run Tests
         id: run-tests
-        run: ./gradlew test --parallel--parallel --max-workers=4
+        run: ./gradlew test --parallel --max-workers=4
 
       - name: Auto-format code
         if: steps.run-tests.outcome == 'success'
