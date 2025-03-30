@@ -126,7 +126,7 @@ spotless {
     // 格式化 Gradle 文件
     format 'gradle', {
         target '*.gradle', 'gradle.properties'
-        indentWithSpaces(4)
+        leadingTabsToSpaces(4)
         trimTrailingWhitespace()
         endWithNewline()
     }
