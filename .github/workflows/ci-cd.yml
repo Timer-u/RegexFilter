@@ -49,11 +49,12 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            ~/.gradle/daemon
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
 
       - name: Run Tests
         id: run-tests
-        run: ./gradlew test --info
+        run: ./gradlew test --parallel--parallel --max-workers=4
 
       - name: Auto-format code
         if: steps.run-tests.outcome == 'success'
@@ -89,7 +90,7 @@ jobs:
           list-tests: failed
 
       - name: Build artifact
-        run: ./gradlew build
+        run: ./gradlew build --build-cache
 
       - name: Upload build
         uses: actions/upload-artifact@v4
