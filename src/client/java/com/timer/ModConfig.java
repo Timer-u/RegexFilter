@@ -68,17 +68,17 @@ public class ModConfig {
                 save(); // 调用 save() 创建默认文件
                 return;
             }
-    
+
             // 使用 BufferedReader 读取文件
             try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
                 ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
-    
+
                 // 处理 loaded 为 null 的情况
                 if (loaded == null) {
                     LOGGER.error("Config file is invalid, using default configuration");
                     loaded = new ModConfig();
                 }
-    
+
                 // 确保 regexFilters 不为 null
                 if (loaded.regexFilters == null) {
                     loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
@@ -89,7 +89,7 @@ public class ModConfig {
                                     .filter(str -> str != null && !str.trim().isEmpty())
                                     .collect(Collectors.toCollection(ArrayList::new));
                 }
-    
+
                 INSTANCE = loaded;
             }
         } catch (IOException e) {
