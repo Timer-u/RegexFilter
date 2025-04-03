@@ -54,38 +54,41 @@ public class ModConfig {
             }
         }
     }
-
+    
     // 加载配置
     public static void load() {
         LOGGER.info("Loading config...");
         try {
             if (!Files.exists(CONFIG_PATH)) {
                 LOGGER.info("Creating default config");
+                Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
                 INSTANCE = new ModConfig();
-                save();
+                save(); // 调用 save() 创建默认文件
                 return;
             }
-
-            String json = Files.readString(CONFIG_PATH);
-            ModConfig loaded = GSON.fromJson(json, ModConfig.class);
-
-            // 处理 loaded 为 null 的情况
-            if (loaded == null) {
-                LOGGER.error("Config file is invalid, using default configuration");
-                loaded = new ModConfig();
+    
+            // 使用 BufferedReader 读取文件
+            try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
+                ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
+    
+                // 处理 loaded 为 null 的情况
+                if (loaded == null) {
+                    LOGGER.error("Config file is invalid, using default configuration");
+                    loaded = new ModConfig();
+                }
+    
+                // 确保 regexFilters 不为 null
+                if (loaded.regexFilters == null) {
+                    loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
+                } else {
+                    loaded.regexFilters = new ArrayList<>(loaded.regexFilters);
+                    loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
+                }
+    
+                INSTANCE = loaded;
+                INSTANCE.updateCompiledPatterns();
+                LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
             }
-
-            // 确保 regexFilters 不为 null
-            if (loaded.regexFilters == null) {
-                loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
-            } else {
-                loaded.regexFilters = new ArrayList<>(loaded.regexFilters);
-                loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
-            }
-
-            INSTANCE = loaded;
-            INSTANCE.updateCompiledPatterns();
-            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
         } catch (IOException | JsonSyntaxException e) {
             LOGGER.error("Config load failed", e);
             INSTANCE = new ModConfig();
@@ -108,11 +111,12 @@ public class ModConfig {
                         return true;
                     }
                 });
-
+    
         INSTANCE.regexFilters = cleanList;
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
-
+    
         try {
+            Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);
             LOGGER.info("Config saved with {} patterns", INSTANCE.compiledPatterns.size());
@@ -120,7 +124,7 @@ public class ModConfig {
             LOGGER.error("Config save failed", e);
         }
     }
-
+    
     // 获取只读的预编译正则列表
     public List<Pattern> getCompiledPatterns() {
         return Collections.unmodifiableList(compiledPatterns);
