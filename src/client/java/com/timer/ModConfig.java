@@ -14,6 +14,7 @@ import java.util.regex.PatternSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.io.BufferedReader;
 
 public class ModConfig {
     private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
