@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import java.util.stream.Collectors;
 
 public class ModConfig {
     private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
@@ -68,27 +68,28 @@ public class ModConfig {
                 save(); // 调用 save() 创建默认文件
                 return;
             }
-    
+
             // 使用 BufferedReader 读取文件
             try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
                 ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
-    
+
                 // 处理 loaded 为 null 的情况
                 if (loaded == null) {
                     LOGGER.error("Config file is invalid, using default configuration");
                     loaded = new ModConfig();
                 }
-    
+
                 // 确保 regexFilters 不为 null
                 if (loaded.regexFilters == null) {
                     loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
                 } else {
                     // 使用 Stream 过滤空或 null 的条目
-                    loaded.regexFilters = loaded.regexFilters.stream()
-                        .filter(str -> str != null && !str.trim().isEmpty())
-                        .collect(Collectors.toCollection(ArrayList::new));
+                    loaded.regexFilters =
+                            loaded.regexFilters.stream()
+                                    .filter(str -> str != null && !str.trim().isEmpty())
+                                    .collect(Collectors.toCollection(ArrayList::new));
                 }
-    
+
                 INSTANCE = loaded;
                 INSTANCE.updateCompiledPatterns();
                 LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
@@ -103,22 +104,24 @@ public class ModConfig {
     // 保存配置
     public static void save() {
         // 清理无效的正则表达式
-        List<String> cleanList = INSTANCE.regexFilters.stream()
-            .filter(str -> str != null && !str.trim().isEmpty())
-            .filter(str -> {
-                try {
-                    Pattern.compile(str); // 仅用于验证，不重复编译
-                    return true;
-                } catch (PatternSyntaxException e) {
-                    LOGGER.warn("Removing invalid pattern: {}", str);
-                    return false;
-                }
-            })
-            .collect(Collectors.toList());
-    
+        List<String> cleanList =
+                INSTANCE.regexFilters.stream()
+                        .filter(str -> str != null && !str.trim().isEmpty())
+                        .filter(
+                                str -> {
+                                    try {
+                                        Pattern.compile(str); // 仅用于验证，不重复编译
+                                        return true;
+                                    } catch (PatternSyntaxException e) {
+                                        LOGGER.warn("Removing invalid pattern: {}", str);
+                                        return false;
+                                    }
+                                })
+                        .collect(Collectors.toList());
+
         INSTANCE.regexFilters = cleanList;
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
-    
+
         try {
             Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
             String json = GSON.toJson(INSTANCE);
