@@ -3,6 +3,7 @@ package com.timer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +15,6 @@ import java.util.regex.PatternSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import java.io.BufferedReader;
 
 public class ModConfig {
     private static final Logger LOGGER = LogManager.getLogger("RegexFilter");
@@ -55,7 +55,7 @@ public class ModConfig {
             }
         }
     }
-    
+
     // 加载配置
     public static void load() {
         LOGGER.info("Loading config...");
@@ -67,17 +67,17 @@ public class ModConfig {
                 save(); // 调用 save() 创建默认文件
                 return;
             }
-    
+
             // 使用 BufferedReader 读取文件
             try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
                 ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
-    
+
                 // 处理 loaded 为 null 的情况
                 if (loaded == null) {
                     LOGGER.error("Config file is invalid, using default configuration");
                     loaded = new ModConfig();
                 }
-    
+
                 // 确保 regexFilters 不为 null
                 if (loaded.regexFilters == null) {
                     loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
@@ -85,7 +85,7 @@ public class ModConfig {
                     loaded.regexFilters = new ArrayList<>(loaded.regexFilters);
                     loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
                 }
-    
+
                 INSTANCE = loaded;
                 INSTANCE.updateCompiledPatterns();
                 LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
@@ -112,10 +112,10 @@ public class ModConfig {
                         return true;
                     }
                 });
-    
+
         INSTANCE.regexFilters = cleanList;
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
-    
+
         try {
             Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
             String json = GSON.toJson(INSTANCE);
@@ -125,7 +125,7 @@ public class ModConfig {
             LOGGER.error("Config save failed", e);
         }
     }
-    
+
     // 获取只读的预编译正则列表
     public List<Pattern> getCompiledPatterns() {
         return Collections.unmodifiableList(compiledPatterns);
