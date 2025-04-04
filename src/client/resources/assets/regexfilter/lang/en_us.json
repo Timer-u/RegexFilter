@@ -10,6 +10,5 @@
   "tooltip.regex_list.2": "Example: ^\\[System\\].* blocks system messages",
   "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns",
   "error.invalid_regex.detail": "Invalid pattern: %s",
-  "tooltip.enabled": "Toggle chat filtering functionality",
   "title.regexfilter.config": "RegexFilter Configuration"
 }
