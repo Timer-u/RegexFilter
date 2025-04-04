@@ -36,9 +36,12 @@ public class ModConfigScreen {
                         .setDefaultValue(DEFAULT_ENABLED)
                         .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
                         // 保持原有Cloth Config本地化键
-                        .setYesNoTextSupplier(value -> 
-                            Text.translatable(value ? "text.cloth-config.on" : "text.cloth-config.off")
-                        )
+                        .setYesNoTextSupplier(
+                                value ->
+                                        Text.translatable(
+                                                value
+                                                        ? "text.cloth-config.on"
+                                                        : "text.cloth-config.off"))
                         .setTooltip(Text.translatable("tooltip.enabled")) // 还原为原始单条提示
                         .requireRestart()
                         .build());
