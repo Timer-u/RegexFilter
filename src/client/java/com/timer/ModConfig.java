@@ -139,9 +139,6 @@ public class ModConfig {
 
     // 获取只读的预编译正则列表
     public List<Pattern> getCompiledPatterns() {
-        return compiledPatterns.stream()
-                .collect(
-                        Collectors.collectingAndThen(
-                                Collectors.toList(), Collections::unmodifiableList));
+        return Collections.unmodifiableList(compiledPatterns);
     }
 }
