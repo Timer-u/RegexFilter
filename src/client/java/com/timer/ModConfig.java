@@ -71,26 +71,24 @@ public class ModConfig {
 
             // 使用 BufferedReader 读取文件
             try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
-                ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
+                // 反序列化为 ConfigRecord
+                ConfigRecord loadedRecord = GSON.fromJson(reader, ConfigRecord.class);
 
-                // 处理 loaded 为 null 的情况
-                if (loaded == null) {
+                // 处理可能的空值或无效 JSON
+                if (loadedRecord == null) {
                     LOGGER.error("Config file is invalid, using default configuration");
-                    loaded = new ModConfig();
+                    loadedRecord = new ConfigRecord(true, new ArrayList<>());
                 }
 
-                // 确保 regexFilters 不为 null
-                if (loaded.regexFilters == null) {
-                    loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
-                } else {
-                    // 使用 Stream 过滤空或 null 的条目
-                    loaded.regexFilters =
-                            loaded.regexFilters.stream()
-                                    .filter(str -> str != null && !str.trim().isEmpty())
-                                    .collect(Collectors.toCollection(ArrayList::new));
-                }
+                // 将 ConfigRecord 数据复制到当前实例
+                INSTANCE.enabled = loadedRecord.enabled();
+                INSTANCE.regexFilters = new ArrayList<>(loadedRecord.regexFilters());
 
-                INSTANCE = loaded;
+                // 数据清理
+                INSTANCE.regexFilters = INSTANCE.regexFilters.stream()
+                        .filter(str -> str != null && !str.trim().isEmpty())
+                        .collect(Collectors.toCollection(ArrayList::new));
+
             }
         } catch (IOException e) {
             LOGGER.error("IO Error loading config: {}", e.getMessage());
@@ -106,30 +104,36 @@ public class ModConfig {
 
     // 保存配置
     public static void save() {
-        // 清理无效的正则表达式
-        List<String> cleanList =
-                INSTANCE.regexFilters.stream()
-                        .filter(str -> str != null && !str.trim().isEmpty())
-                        .filter(
-                                str -> {
-                                    try {
-                                        Pattern.compile(str); // 仅用于验证，不重复编译
-                                        return true;
-                                    } catch (PatternSyntaxException e) {
-                                        LOGGER.warn("Removing invalid pattern: {}", str);
-                                        return false;
-                                    }
-                                })
-                        .collect(Collectors.toList());
+        // 创建要保存的 ConfigRecord 实例
+        ConfigRecord toSave = new ConfigRecord(
+            INSTANCE.enabled,
+            INSTANCE.regexFilters
+        );
 
+        // 清理无效正则表达式
+        List<String> cleanList = toSave.regexFilters().stream()
+                .filter(str -> str != null && !str.trim().isEmpty())
+                .filter(
+                        str -> {
+                            try {
+                                Pattern.compile(str); // 仅用于验证，不重复编译
+                                return true;
+                            } catch (PatternSyntaxException e) {
+                                LOGGER.warn("Removing invalid pattern: {}", str);
+                                return false;
+                            }
+                        })
+                .collect(Collectors.toList());
+
+        // 更新实例并保存
         INSTANCE.regexFilters = cleanList;
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
 
         try {
             Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
-            String json = GSON.toJson(INSTANCE);
+            String json = GSON.toJson(toSave); // 序列化 ConfigRecord
             Files.writeString(CONFIG_PATH, json);
-            LOGGER.info("Config saved with {} patterns", INSTANCE.compiledPatterns.size());
+            LOGGER.info("Config saved with {} patterns", cleanList.size());
         } catch (IOException e) {
             LOGGER.error("Config save failed", e);
         }
