@@ -85,10 +85,10 @@ public class ModConfig {
                 INSTANCE.regexFilters = new ArrayList<>(loadedRecord.regexFilters());
 
                 // 数据清理
-                INSTANCE.regexFilters = INSTANCE.regexFilters.stream()
-                        .filter(str -> str != null && !str.trim().isEmpty())
-                        .collect(Collectors.toCollection(ArrayList::new));
-
+                INSTANCE.regexFilters =
+                        INSTANCE.regexFilters.stream()
+                                .filter(str -> str != null && !str.trim().isEmpty())
+                                .collect(Collectors.toCollection(ArrayList::new));
             }
         } catch (IOException e) {
             LOGGER.error("IO Error loading config: {}", e.getMessage());
@@ -105,25 +105,23 @@ public class ModConfig {
     // 保存配置
     public static void save() {
         // 创建要保存的 ConfigRecord 实例
-        ConfigRecord toSave = new ConfigRecord(
-            INSTANCE.enabled,
-            INSTANCE.regexFilters
-        );
+        ConfigRecord toSave = new ConfigRecord(INSTANCE.enabled, INSTANCE.regexFilters);
 
         // 清理无效正则表达式
-        List<String> cleanList = toSave.regexFilters().stream()
-                .filter(str -> str != null && !str.trim().isEmpty())
-                .filter(
-                        str -> {
-                            try {
-                                Pattern.compile(str); // 仅用于验证，不重复编译
-                                return true;
-                            } catch (PatternSyntaxException e) {
-                                LOGGER.warn("Removing invalid pattern: {}", str);
-                                return false;
-                            }
-                        })
-                .collect(Collectors.toList());
+        List<String> cleanList =
+                toSave.regexFilters().stream()
+                        .filter(str -> str != null && !str.trim().isEmpty())
+                        .filter(
+                                str -> {
+                                    try {
+                                        Pattern.compile(str); // 仅用于验证，不重复编译
+                                        return true;
+                                    } catch (PatternSyntaxException e) {
+                                        LOGGER.warn("Removing invalid pattern: {}", str);
+                                        return false;
+                                    }
+                                })
+                        .collect(Collectors.toList());
 
         // 更新实例并保存
         INSTANCE.regexFilters = cleanList;
