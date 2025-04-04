@@ -55,22 +55,20 @@ public class ModConfigScreen {
                         .setInsertButtonEnabled(true)
                         .setDeleteButtonEnabled(true)
                         .setCellErrorSupplier(
-                            value -> {
-                                if (value == null || value.isEmpty()) {
-                                    return Optional.empty();
-                                }
-                                try {
-                                    Pattern.compile(value);
-                                    return Optional.empty();
-                                } catch (PatternSyntaxException e) {
-                                    return Optional.of(
-                                        Text.translatable(
-                                            "error.invalid_regex.detail",
-                                            e.getDescription()
-                                        )
-                                    );
-                                }
-                            })
+                                value -> {
+                                    if (value == null || value.isEmpty()) {
+                                        return Optional.empty();
+                                    }
+                                    try {
+                                        Pattern.compile(value);
+                                        return Optional.empty();
+                                    } catch (PatternSyntaxException e) {
+                                        return Optional.of(
+                                                Text.translatable(
+                                                        "error.invalid_regex.detail",
+                                                        e.getDescription()));
+                                    }
+                                })
                         .setSaveConsumer(
                                 newList -> {
                                     newList.removeIf(str -> str == null || str.trim().isEmpty());
