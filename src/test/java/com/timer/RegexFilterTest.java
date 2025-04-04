@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import net.minecraft.text.Text;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class RegexFilterTest {
     private static Path tempConfig;
@@ -36,19 +38,18 @@ public class RegexFilterTest {
         ModConfig.load(); // 应用配置
     }
 
-    @Test
-    void shouldBlockMatchingMessages() {
-        assertShouldBlock("[System] Server restart", true);
-        assertShouldBlock("Using hack tool", true);
-        assertShouldBlock("SPECIFIC PHRASE", true); // 测试不区分大小写
-        assertShouldBlock("Specific Phrase", true); // 测试混合大小写
-    }
-
-    @Test
-    void shouldAllowNonMatchingMessages() {
-        assertShouldBlock("Normal message", false);
-        assertShouldBlock("[Info] Player joined", false);
-        assertShouldBlock("Specificphrase", false);
+    @ParameterizedTest
+    @CsvSource({
+        "[System] Server restart, true",
+        "Using hack tool, true",
+        "SPECIFIC PHRASE, true",
+        "Specific Phrase, true",
+        "Normal message, false",
+        "[Info] Player joined, false",
+        "Specificphrase, false"
+    })
+    void testMessageFiltering(String message, boolean expectedToBlock) {
+        assertShouldBlock(message, expectedToBlock);
     }
 
     @AfterEach
