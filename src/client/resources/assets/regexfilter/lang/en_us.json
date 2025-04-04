@@ -5,9 +5,10 @@
   "text.cloth-config.on": "Enabled",
   "category.general": "General Settings",
   "option.enabled": "Enable Mod",
+  "tooltip.enabled": "Toggle message filtering functionality",
+  "tooltip.regex_list.1": "Use Java regex syntax (^ for start, $ for end)",
   "tooltip.regex_list.2": "Example: ^\\[System\\].* blocks system messages",
   "modmenu.descriptionTranslation.regexfilter": "Advanced chat filtering with regex patterns",
-  "tooltip.regex_list.1": "Use Java regex syntax (^ for start, $ for end)",
   "error.invalid_regex.detail": "Invalid pattern: %s",
   "tooltip.enabled": "Toggle chat filtering functionality",
   "title.regexfilter.config": "RegexFilter Configuration"

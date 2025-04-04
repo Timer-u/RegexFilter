@@ -5,9 +5,10 @@
   "text.cloth-config.on": "已启用",
   "category.general": "通用设置",
   "option.enabled": "启用模组",
+  "tooltip.regex_list.1": "使用Java正则语法（^表示开头，$表示结尾）",
   "tooltip.regex_list.2": "示例：^\\[系统\\].* 可屏蔽系统消息",
   "modmenu.descriptionTranslation.regexfilter": "基于正则表达式的高级聊天过滤器",
-  "tooltip.regex_list.1": "使用Java正则语法（^表示开头，$表示结尾）",
+  "tooltip.enabled": "切换聊天消息过滤功能",
   "error.invalid_regex.detail": "无效模式：%s",
   "tooltip.enabled": "开关聊天过滤功能",
   "title.regexfilter.config": "正则过滤器配置"

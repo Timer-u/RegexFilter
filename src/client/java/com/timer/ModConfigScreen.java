@@ -35,13 +35,11 @@ public class ModConfigScreen {
                                 ModConfig.getInstance().enabled)
                         .setDefaultValue(DEFAULT_ENABLED)
                         .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
-                        .setYesNoTextSupplier(
-                                value ->
-                                        Text.translatable(
-                                                value
-                                                        ? "text.cloth-config.on"
-                                                        : "text.cloth-config.off"))
-                        .setTooltip(Text.translatable("tooltip.enabled"))
+                        // 保持原有Cloth Config本地化键
+                        .setYesNoTextSupplier(value -> 
+                            Text.translatable(value ? "text.cloth-config.on" : "text.cloth-config.off")
+                        )
+                        .setTooltip(Text.translatable("tooltip.enabled")) // 还原为原始单条提示
                         .requireRestart()
                         .build());
 
@@ -54,6 +52,7 @@ public class ModConfigScreen {
                         .setDefaultValue(Collections.emptyList())
                         .setInsertButtonEnabled(true)
                         .setDeleteButtonEnabled(true)
+                        // 实时验证正则表达式有效性
                         .setCellErrorSupplier(
                                 value -> {
                                     if (value == null || value.isEmpty()) {
@@ -69,6 +68,7 @@ public class ModConfigScreen {
                                                         e.getDescription()));
                                     }
                                 })
+                        // 保存时自动清理空值和无效正则
                         .setSaveConsumer(
                                 newList -> {
                                     newList.removeIf(str -> str == null || str.trim().isEmpty());
