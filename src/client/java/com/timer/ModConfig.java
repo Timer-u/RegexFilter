@@ -7,9 +7,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -22,7 +22,7 @@ public class ModConfig {
 
     // 实例字段
     public boolean enabled = true;
-    public List<String> regexFilters = new ArrayList<>();
+    private List<String> regexFilters = new CopyOnWriteArrayList<>();
 
     // 单例管理
     private static ModConfig INSTANCE = new ModConfig();
@@ -41,7 +41,7 @@ public class ModConfig {
     }
 
     // 预编译的正则表达式缓存
-    private transient List<Pattern> compiledPatterns = new ArrayList<>();
+    private transient List<Pattern> compiledPatterns = new CopyOnWriteArrayList<>();
 
     // 更新预编译的正则表达式
     void updateCompiledPatterns() {
@@ -77,18 +77,19 @@ public class ModConfig {
                 // 处理可能的空值或无效 JSON
                 if (loadedRecord == null) {
                     LOGGER.error("Config file is invalid, using default configuration");
-                    loadedRecord = new ConfigRecord(true, new ArrayList<>());
+                    loadedRecord = new ConfigRecord(true, new CopyOnWriteArrayList<>());
                 }
 
                 // 将 ConfigRecord 数据复制到当前实例
                 INSTANCE.enabled = loadedRecord.enabled();
-                INSTANCE.regexFilters = new ArrayList<>(loadedRecord.regexFilters());
+                // 初始化线程安全列表
+                INSTANCE.regexFilters = new CopyOnWriteArrayList<>(loadedRecord.regexFilters());
 
-                // 数据清理
+                // 数据清理：过滤空值和无效正则
                 INSTANCE.regexFilters =
                         INSTANCE.regexFilters.stream()
                                 .filter(str -> str != null && !str.trim().isEmpty())
-                                .collect(Collectors.toCollection(ArrayList::new));
+                                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
             }
         } catch (IOException e) {
             LOGGER.error("IO Error loading config: {}", e.getMessage());
@@ -105,7 +106,10 @@ public class ModConfig {
     // 保存配置
     public static void save() {
         // 创建要保存的 ConfigRecord 实例
-        ConfigRecord toSave = new ConfigRecord(INSTANCE.enabled, INSTANCE.regexFilters);
+        ConfigRecord toSave = new ConfigRecord(
+            INSTANCE.enabled,
+            List.copyOf(INSTANCE.regexFilters) // 生成不可变副本
+        );
 
         // 清理无效正则表达式
         List<String> cleanList =
@@ -124,7 +128,7 @@ public class ModConfig {
                         .collect(Collectors.toList());
 
         // 更新实例并保存
-        INSTANCE.regexFilters = cleanList;
+        INSTANCE.regexFilters = new CopyOnWriteArrayList<>(cleanList);
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
 
         try {
@@ -140,5 +144,15 @@ public class ModConfig {
     // 获取只读的预编译正则列表
     public List<Pattern> getCompiledPatterns() {
         return Collections.unmodifiableList(compiledPatterns);
+    }
+
+    // 外部访问正则列表时返回不可变副本
+    public List<String> getRegexFilters() {
+        return List.copyOf(regexFilters);
+    }
+
+    // 更新正则列表
+    public void setRegexFilters(List<String> newFilters) {
+        this.regexFilters = new CopyOnWriteArrayList<>(newFilters);
     }
 }

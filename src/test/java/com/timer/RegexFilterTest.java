@@ -56,7 +56,7 @@ public class RegexFilterTest {
     void reset() {
         // 重置配置到初始状态
         ModConfig.getInstance().enabled = true;
-        ModConfig.getInstance().regexFilters = new ArrayList<>();
+        ModConfig.getInstance().setRegexFilters(new CopyOnWriteArrayList<>());
         ModConfig.save();
         ModConfig.load();
     }

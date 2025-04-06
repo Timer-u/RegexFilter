@@ -35,9 +35,8 @@ public class ModConfigTest {
 
     @Test
     void save_shouldCleanInvalidRegex() {
-        ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid");
+        ModConfig.getInstance().regexFilters = new CopyOnWriteArrayList<>(List.of("valid.*", "[invalid"));
         ModConfig.save();
-
         assertThat(ModConfig.getInstance().regexFilters).containsExactly("valid.*");
     }
 
