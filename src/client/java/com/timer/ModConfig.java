@@ -106,10 +106,10 @@ public class ModConfig {
     // 保存配置
     public static void save() {
         // 创建要保存的 ConfigRecord 实例
-        ConfigRecord toSave = new ConfigRecord(
-            INSTANCE.enabled,
-            List.copyOf(INSTANCE.regexFilters) // 生成不可变副本
-        );
+        ConfigRecord toSave =
+                new ConfigRecord(
+                        INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters) // 生成不可变副本
+                        );
 
         // 清理无效正则表达式
         List<String> cleanList =

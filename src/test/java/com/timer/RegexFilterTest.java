@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import net.minecraft.text.Text;
 import org.junit.jupiter.api.*;
@@ -34,7 +33,8 @@ public class RegexFilterTest {
         config = ModConfig.getInstance();
         config.enabled = true;
         // 设置正则列表
-        config.setRegexFilters(List.of("^\\[System\\].*", ".*(cheat|hack).*", "(?i)specific phrase"));
+        config.setRegexFilters(
+                List.of("^\\[System\\].*", ".*(cheat|hack).*", "(?i)specific phrase"));
         ModConfig.save();
         ModConfig.load();
     }
