@@ -41,16 +41,12 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
-          cache: gradle
 
-      - name: Cache dependencies
-        uses: actions/cache@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.gradle/daemon
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}  # 仅在dev分支写入缓存
 
       - name: Run Tests
         id: run-tests
@@ -112,12 +108,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mod-package  
-          path: release-files/  
+          path: release-files/ # 匹配下载路径
 
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: release-files/*.jar  # 匹配下载路径
+          files: release-files/*.jar
           draft: true
           generate_release_notes: true
-          
