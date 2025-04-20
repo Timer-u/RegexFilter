@@ -51,10 +51,11 @@ public class ModConfig {
             for (String regex : regexFilters) {
                 try {
                     // 检查是否已经编译过相同的正则表达式
-                    Optional<Pattern> existing = compiledPatterns.stream()
-                        .filter(p -> p.pattern().equals(regex))
-                        .findFirst();
-                    
+                    Optional<Pattern> existing =
+                            compiledPatterns.stream()
+                                    .filter(p -> p.pattern().equals(regex))
+                                    .findFirst();
+
                     if (existing.isPresent()) {
                         newPatterns.add(existing.get()); // 重用已编译的 Pattern
                     } else {
