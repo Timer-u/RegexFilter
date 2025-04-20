@@ -2,7 +2,7 @@
 
 # RegexFilter
 
-一个基于 Fabric 的 Minecraft 模组，支持通过正则表达式屏蔽聊天消息，提供基于Cloth
+一个基于 Fabric 的 Minecraft 模组，支持通过正则表达式屏蔽聊天消息，提供基于 Cloth
 Config API 的可视化配置界面。
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
