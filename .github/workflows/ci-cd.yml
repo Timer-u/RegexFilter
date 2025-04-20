@@ -69,6 +69,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # 上传 JAR 文件
+      - name: Upload Dev Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-mod-package
+          path: build/libs/*.jar
+
+      # 上传测试报告
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
