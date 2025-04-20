@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -45,16 +46,26 @@ public class ModConfig {
 
     // 更新预编译的正则表达式
     void updateCompiledPatterns() {
-        compiledPatterns.clear();
-        if (regexFilters == null) return;
-
-        for (String regex : regexFilters) {
-            try {
-                compiledPatterns.add(Pattern.compile(regex));
-            } catch (PatternSyntaxException e) {
-                LOGGER.warn("Skipping invalid pattern during compilation: {}", regex);
+        List<Pattern> newPatterns = new CopyOnWriteArrayList<>();
+        if (regexFilters != null) {
+            for (String regex : regexFilters) {
+                try {
+                    // 检查是否已经编译过相同的正则表达式
+                    Optional<Pattern> existing = compiledPatterns.stream()
+                        .filter(p -> p.pattern().equals(regex))
+                        .findFirst();
+                    
+                    if (existing.isPresent()) {
+                        newPatterns.add(existing.get()); // 重用已编译的 Pattern
+                    } else {
+                        newPatterns.add(Pattern.compile(regex));
+                    }
+                } catch (PatternSyntaxException e) {
+                    LOGGER.warn("Skipping invalid pattern during compilation: {}", regex);
+                }
             }
         }
+        compiledPatterns = newPatterns;
     }
 
     // 加载配置
