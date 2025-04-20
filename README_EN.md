@@ -29,6 +29,9 @@ API.
 
 ## Regular Expression Examples
 
+> **Note**: The following examples are common use cases only. You need to adjust
+> the rules according to your actual needs.
+
 | Use Case                               | Regular Expression       | Description                                                                                                                         |
 | -------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | Filter messages from a specific player | `^\[?\w+\]? >.*`         | Matches formats like `[Player] > Message` or `Player: Message`. Replace `\w+` with the actual player name (e.g., `^Steve >.*`).     |
