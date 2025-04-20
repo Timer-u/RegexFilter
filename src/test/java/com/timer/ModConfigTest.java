@@ -15,7 +15,7 @@ public class ModConfigTest {
     @BeforeAll
     static void setup() throws IOException {
         tempConfig = Files.createTempFile("regexfilter-test", ".json");
-        ModConfig.setConfigPathForTest(tempConfig); // 使用新方法设置路径
+        ModConfig.setConfigPathForTest(tempConfig);
     }
 
     @AfterEach
@@ -25,35 +25,32 @@ public class ModConfigTest {
 
     @Test
     void load_shouldHandleMissingFile() {
-        // 删除临时文件模拟文件不存在的情况
         tempConfig.toFile().delete();
-
         ModConfig.load();
         assertThat(ModConfig.getInstance().enabled).isTrue();
-        assertThat(ModConfig.getInstance().regexFilters).isEmpty();
+        // 获取正则列表
+        assertThat(ModConfig.getInstance().getRegexFilters()).isEmpty();
     }
 
     @Test
     void save_shouldCleanInvalidRegex() {
-        ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid");
+        ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[invalid"));
         ModConfig.save();
-
-        assertThat(ModConfig.getInstance().regexFilters).containsExactly("valid.*");
+        // 验证清理后的列表
+        assertThat(ModConfig.getInstance().getRegexFilters()).containsExactly("valid.*");
     }
 
     @Test
     void load_shouldHandleInvalidJson() throws IOException {
         Files.writeString(tempConfig, "{ invalid json }");
-
         ModConfig.load();
-        assertThat(ModConfig.getInstance().enabled).isTrue(); // 使用默认值
+        assertThat(ModConfig.getInstance().enabled).isTrue();
     }
 
     @Test
     void shouldCompileValidPatterns() {
-        ModConfig.getInstance().regexFilters = List.of("valid.*", "[a-z]+");
+        ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[a-z]+"));
         ModConfig.getInstance().updateCompiledPatterns();
-
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
         assertThat(compiled).hasSize(2);
         assertThat(compiled.get(0).pattern()).isEqualTo("valid.*");
@@ -61,9 +58,8 @@ public class ModConfigTest {
 
     @Test
     void shouldSkipInvalidPatterns() {
-        ModConfig.getInstance().regexFilters = List.of("valid.*", "[invalid[");
+        ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[invalid["));
         ModConfig.getInstance().updateCompiledPatterns();
-
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
         assertThat(compiled).hasSize(1);
     }

@@ -41,26 +41,23 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
-          cache: gradle
 
-      - name: Cache dependencies
-        uses: actions/cache@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/dev' }}  # 仅在dev分支写入缓存
 
       - name: Run Tests
         id: run-tests
-        run: ./gradlew test --info
+        run: ./gradlew test --parallel --max-workers=4
 
       - name: Auto-format code
         if: steps.run-tests.outcome == 'success'
         run: |
           ./gradlew spotlessApply
-          git config --global user.name "CI Bot"
-          git config --global user.email "ci@example.com"
+          git config --global user.name "Github Actions"
+          git config --global user.email "actions@github.com"
           git add .
           if git diff-index --quiet HEAD --; then
             echo "No formatting changes"
@@ -68,6 +65,7 @@ jobs:
             git commit -m "Auto-format code [skip ci]"
             git push origin HEAD:dev
           fi
+
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
@@ -76,6 +74,7 @@ jobs:
           path: |
             build/test-results/test/**/*.xml
             build/reports/tests/test/
+
       - name: Analyze Test Results
         uses: dorny/test-reporter@v1
         if: failure()
@@ -87,12 +86,12 @@ jobs:
           list-tests: failed
 
       - name: Build artifact
-        run: ./gradlew build
+        run: ./gradlew build --build-cache
 
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
-          name: mod-package
+          name: mod-package  
           path: build/libs/*.jar
 
   release:
@@ -108,14 +107,12 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: mod-package
-          path: release/
+          name: mod-package  
+          path: release-files/ # 匹配下载路径
 
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v${{ format('{0:%Y%m%d}-{1}', github.event.head_commit.timestamp, github.run_number) }}"
-          files: release/*.jar
+          files: release-files/*.jar
           draft: true
           generate_release_notes: true
-          

@@ -3,14 +3,17 @@ package com.timer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +23,7 @@ public class ModConfig {
 
     // 实例字段
     public boolean enabled = true;
-    public List<String> regexFilters = new ArrayList<>();
+    private List<String> regexFilters = new CopyOnWriteArrayList<>();
 
     // 单例管理
     private static ModConfig INSTANCE = new ModConfig();
@@ -39,20 +42,31 @@ public class ModConfig {
     }
 
     // 预编译的正则表达式缓存
-    private transient List<Pattern> compiledPatterns = new ArrayList<>();
+    private transient List<Pattern> compiledPatterns = new CopyOnWriteArrayList<>();
 
     // 更新预编译的正则表达式
     void updateCompiledPatterns() {
-        compiledPatterns.clear();
-        if (regexFilters == null) return;
+        List<Pattern> newPatterns = new CopyOnWriteArrayList<>();
+        if (regexFilters != null) {
+            for (String regex : regexFilters) {
+                try {
+                    // 检查是否已经编译过相同的正则表达式
+                    Optional<Pattern> existing =
+                            compiledPatterns.stream()
+                                    .filter(p -> p.pattern().equals(regex))
+                                    .findFirst();
 
-        for (String regex : regexFilters) {
-            try {
-                compiledPatterns.add(Pattern.compile(regex));
-            } catch (PatternSyntaxException e) {
-                LOGGER.warn("Skipping invalid pattern during compilation: {}", regex);
+                    if (existing.isPresent()) {
+                        newPatterns.add(existing.get()); // 重用已编译的 Pattern
+                    } else {
+                        newPatterns.add(Pattern.compile(regex));
+                    }
+                } catch (PatternSyntaxException e) {
+                    LOGGER.warn("Skipping invalid pattern during compilation: {}", regex);
+                }
             }
         }
+        compiledPatterns = newPatterns;
     }
 
     // 加载配置
@@ -61,61 +75,79 @@ public class ModConfig {
         try {
             if (!Files.exists(CONFIG_PATH)) {
                 LOGGER.info("Creating default config");
+                Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
                 INSTANCE = new ModConfig();
-                save();
+                save(); // 调用 save() 创建默认文件
                 return;
             }
 
-            String json = Files.readString(CONFIG_PATH);
-            ModConfig loaded = GSON.fromJson(json, ModConfig.class);
+            // 使用 BufferedReader 读取文件
+            try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
+                // 反序列化为 ConfigRecord
+                ConfigRecord loadedRecord = GSON.fromJson(reader, ConfigRecord.class);
 
-            // 处理 loaded 为 null 的情况
-            if (loaded == null) {
-                LOGGER.error("Config file is invalid, using default configuration");
-                loaded = new ModConfig();
+                // 处理可能的空值或无效 JSON
+                if (loadedRecord == null) {
+                    LOGGER.error("Config file is invalid, using default configuration");
+                    loadedRecord = new ConfigRecord(true, new CopyOnWriteArrayList<>());
+                }
+
+                // 将 ConfigRecord 数据复制到当前实例
+                INSTANCE.enabled = loadedRecord.enabled();
+                // 初始化线程安全列表
+                INSTANCE.regexFilters = new CopyOnWriteArrayList<>(loadedRecord.regexFilters());
+
+                // 数据清理：过滤空值和无效正则
+                INSTANCE.regexFilters =
+                        INSTANCE.regexFilters.stream()
+                                .filter(str -> str != null && !str.trim().isEmpty())
+                                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
             }
-
-            // 确保 regexFilters 不为 null
-            if (loaded.regexFilters == null) {
-                loaded.regexFilters = new ArrayList<>(INSTANCE.regexFilters);
-            } else {
-                loaded.regexFilters = new ArrayList<>(loaded.regexFilters);
-                loaded.regexFilters.removeIf(str -> str == null || str.trim().isEmpty());
-            }
-
-            INSTANCE = loaded;
-            INSTANCE.updateCompiledPatterns();
-            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
-        } catch (IOException | JsonSyntaxException e) {
-            LOGGER.error("Config load failed", e);
+        } catch (IOException e) {
+            LOGGER.error("IO Error loading config: {}", e.getMessage());
             INSTANCE = new ModConfig();
-            INSTANCE.updateCompiledPatterns();
+        } catch (JsonSyntaxException e) {
+            LOGGER.error("Invalid JSON syntax: {}", e.getMessage());
+            INSTANCE = new ModConfig();
+        } finally {
+            INSTANCE.updateCompiledPatterns(); // 始终更新预编译正则表达式
+            LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
         }
     }
 
     // 保存配置
     public static void save() {
-        // 清理无效的正则表达式
-        List<String> cleanList = new ArrayList<>(INSTANCE.regexFilters);
-        cleanList.removeIf(
-                str -> {
-                    if (str == null || str.trim().isEmpty()) return true;
-                    try {
-                        Pattern.compile(str); // 仅用于验证，不重复编译
-                        return false;
-                    } catch (PatternSyntaxException e) {
-                        LOGGER.warn("Removing invalid pattern: {}", str);
-                        return true;
-                    }
-                });
+        // 创建要保存的 ConfigRecord 实例
+        ConfigRecord toSave =
+                new ConfigRecord(
+                        INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters) // 生成不可变副本
+                        );
 
-        INSTANCE.regexFilters = cleanList;
+        // 清理无效正则表达式
+        List<String> cleanList =
+                toSave.regexFilters().stream()
+                        .filter(str -> str != null && !str.trim().isEmpty())
+                        .filter(
+                                str -> {
+                                    try {
+                                        Pattern.compile(str); // 仅用于验证，不重复编译
+                                        return true;
+                                    } catch (PatternSyntaxException e) {
+                                        LOGGER.warn("Removing invalid pattern: {}", str);
+                                        return false;
+                                    }
+                                })
+                        .collect(Collectors.toList());
+
+        // 更新实例并保存
+        INSTANCE.regexFilters = new CopyOnWriteArrayList<>(cleanList);
         INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
 
         try {
-            String json = GSON.toJson(INSTANCE);
+            Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
+            String json = GSON.toJson(toSave); // 序列化 ConfigRecord
             Files.writeString(CONFIG_PATH, json);
-            LOGGER.info("Config saved with {} patterns", INSTANCE.compiledPatterns.size());
+            LOGGER.info("Config saved with {} patterns", cleanList.size());
         } catch (IOException e) {
             LOGGER.error("Config save failed", e);
         }
@@ -124,5 +156,15 @@ public class ModConfig {
     // 获取只读的预编译正则列表
     public List<Pattern> getCompiledPatterns() {
         return Collections.unmodifiableList(compiledPatterns);
+    }
+
+    // 外部访问正则列表时返回不可变副本
+    public List<String> getRegexFilters() {
+        return List.copyOf(regexFilters);
+    }
+
+    // 更新正则列表
+    public void setRegexFilters(List<String> newFilters) {
+        this.regexFilters = new CopyOnWriteArrayList<>(newFilters);
     }
 }
