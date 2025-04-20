@@ -11,7 +11,7 @@
   "custom": {"modmenu": {}},
   "icon": "assets/regexfilter/icon.png",
   "description": "Advanced chat filtering with regex patterns | 基于正则表达式的聊天过滤器",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "GPL-3.0-only",
   "suggests": {},
   "environment": "client",
