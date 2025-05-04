@@ -1,6 +1,6 @@
 {
   "package": "com.timer.mixin.client",
-  "injectors": {"defaultRequire": 1},
+  "injectors": { "defaultRequire": 1 },
   "compatibilityLevel": "JAVA_21",
   "client": [],
   "required": true

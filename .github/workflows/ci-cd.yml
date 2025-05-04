@@ -5,11 +5,11 @@ on:
     branches:
       - dev
       - main
-    paths:  
-      - 'src/**'
-      - '*.gradle'
-      - 'gradle.properties'
-      - '.github/**'
+    paths:
+      - "src/**"
+      - "*.gradle"
+      - "gradle.properties"
+      - ".github/**"
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
     name: Dev Pipeline (Format, Test, Build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: github.ref == 'refs/heads/dev'  # 仅在 dev 分支执行
+    if: github.ref == 'refs/heads/dev' # 仅在 dev 分支执行
     env:
       JAVA_VERSION: 21
       GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -46,7 +46,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-read-only: false  # 允许写入缓存
+          cache-read-only: false # 允许写入缓存
 
       - name: Run Tests
         run: ./gradlew test --parallel --max-workers=4
@@ -89,7 +89,7 @@ jobs:
   main-pipeline:
     name: Main Pipeline (Build and Release)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # 仅在main分支执行
+    if: github.ref == 'refs/heads/main' # 仅在main分支执行
     timeout-minutes: 15
     env:
       JAVA_VERSION: 21
@@ -114,7 +114,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-read-only: true  # 仅读取缓存
+          cache-read-only: true # 仅读取缓存
 
       - name: Build Artifact
         run: ./gradlew build --build-cache
@@ -122,12 +122,12 @@ jobs:
       - name: Upload Artifact for Release
         uses: actions/upload-artifact@v4
         with:
-          name: mod-package  
+          name: mod-package
           path: build/libs/*.jar
 
   release:
     name: Publish Release
-    needs: main-pipeline  # 仅依赖 main 分支的构建作业
+    needs: main-pipeline # 仅依赖 main 分支的构建作业
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release
@@ -138,7 +138,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: mod-package  
+          name: mod-package
           path: release-files/
 
       - name: Create release
@@ -147,4 +147,3 @@ jobs:
           files: release-files/*.jar
           draft: true
           generate_release_notes: true
-          
