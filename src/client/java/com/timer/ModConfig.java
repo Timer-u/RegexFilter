@@ -118,29 +118,31 @@ public class ModConfig {
     // 保存配置
     public static void save() {
         // 清理无效正则表达式并更新实例数据
-        List<String> cleanList = INSTANCE.regexFilters.stream()
-                .filter(str -> str != null && !str.trim().isEmpty()) // 过滤空值和空白字符串
-                .filter(str -> {
-                    try {
-                        Pattern.compile(str); // 验证正则表达式有效性
-                        return true;
-                    } catch (PatternSyntaxException e) {
-                        LOGGER.warn("Removing invalid pattern: {}", str);
-                        return false;
-                    }
-                })
-                .collect(Collectors.toList()); // 收集为普通列表
-    
+        List<String> cleanList =
+                INSTANCE.regexFilters.stream()
+                        .filter(str -> str != null && !str.trim().isEmpty()) // 过滤空值和空白字符串
+                        .filter(
+                                str -> {
+                                    try {
+                                        Pattern.compile(str); // 验证正则表达式有效性
+                                        return true;
+                                    } catch (PatternSyntaxException e) {
+                                        LOGGER.warn("Removing invalid pattern: {}", str);
+                                        return false;
+                                    }
+                                })
+                        .collect(Collectors.toList()); // 收集为普通列表
+
         // 使用线程安全集合更新实例的正则列表
         INSTANCE.regexFilters = new CopyOnWriteArrayList<>(cleanList);
         INSTANCE.updateCompiledPatterns(); // 更新预编译正则缓存
-    
+
         // 创建要保存的 ConfigRecord 实例
-        ConfigRecord toSave = new ConfigRecord(
-                INSTANCE.enabled,
-                List.copyOf(INSTANCE.regexFilters) // 生成不可变副本以避免外部修改
-        );
-    
+        ConfigRecord toSave =
+                new ConfigRecord(
+                        INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters) // 生成不可变副本以避免外部修改
+                        );
+
         // 序列化并写入配置文件
         try {
             Files.createDirectories(CONFIG_PATH.getParent()); // 确保配置目录存在
