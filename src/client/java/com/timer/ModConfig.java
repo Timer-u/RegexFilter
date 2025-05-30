@@ -103,21 +103,25 @@ public class ModConfig {
                 // 初始化线程安全列表
                 INSTANCE.regexFilters = new CopyOnWriteArrayList<>(loadedRecord.regexFilters());
 
-                List<String> validRegex = INSTANCE.regexFilters.stream()
-                        .filter(str -> str != null && !str.trim().isEmpty())
-                        .filter(str -> {
-                            try {
-                                Pattern.compile(str); // 验证正则表达式有效性
-                                return true;
-                            } catch (PatternSyntaxException e) {
-                                LOGGER.warn("Removing invalid pattern during loading: {}", str);
-                                return false;
-                            }
-                        })
-                        .collect(Collectors.toList());
+                List<String> validRegex =
+                        INSTANCE.regexFilters.stream()
+                                .filter(str -> str != null && !str.trim().isEmpty())
+                                .filter(
+                                        str -> {
+                                            try {
+                                                Pattern.compile(str); // 验证正则表达式有效性
+                                                return true;
+                                            } catch (PatternSyntaxException e) {
+                                                LOGGER.warn(
+                                                        "Removing invalid pattern during loading: {}",
+                                                        str);
+                                                return false;
+                                            }
+                                        })
+                                .collect(Collectors.toList());
 
                 INSTANCE.regexFilters = new CopyOnWriteArrayList<>(validRegex);
-                
+
                 // 加载后更新预编译正则缓存
                 INSTANCE.updateCompiledPatterns();
             }
@@ -155,9 +159,7 @@ public class ModConfig {
 
         // 创建要保存的 ConfigRecord 实例
         ConfigRecord toSave =
-                new ConfigRecord(
-                        INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters)
-                        );
+                new ConfigRecord(INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters));
 
         // 序列化并写入配置文件
         try {
