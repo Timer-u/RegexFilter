@@ -57,11 +57,11 @@ dependencies {
 }
 
 processResources {
-	inputs.property "version", project.version
+    inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
-	}
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -91,7 +91,7 @@ java {
 
 jar {
     inputs.property "archivesName", project.archives_base_name  // 添加输入属性声明
-    
+
     from("LICENSE") {
         rename { "${it}_${inputs.properties.archivesName}" }  // 使用延迟求值
     }
