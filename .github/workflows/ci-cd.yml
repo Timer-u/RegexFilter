@@ -52,8 +52,6 @@ jobs:
         run: ./gradlew test --parallel --max-workers=4
 
       - name: Auto-format code
-        permissions:
-          contents: write
         run: |
           ./gradlew spotlessApply
           git config user.name "github-actions[bot]"
