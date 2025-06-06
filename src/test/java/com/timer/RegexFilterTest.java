@@ -11,6 +11,8 @@ import net.minecraft.text.Text;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import java.util.stream.Stream;
 
 public class RegexFilterTest {
     private static Path tempConfig;
@@ -39,18 +41,22 @@ public class RegexFilterTest {
         ModConfig.load();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "[System] Server restart, true",
-        "Using hack tool, true",
-        "SPECIFIC PHRASE, true",
-        "Specific Phrase, true",
-        "Normal message, false",
-        "[Info] Player joined, false",
-        "Specificphrase, false"
-    })
+    @ParameterizedTest(name = "消息 [{0}] 应被拦截: {1}")
+    @MethodSource("messageFilteringProvider")
     void testMessageFiltering(String message, boolean expectedToBlock) {
         assertShouldBlock(message, expectedToBlock);
+    }
+
+    private static Stream<Arguments> messageFilteringProvider() {
+        return Stream.of(
+            Arguments.of("[System] Server restart", true),
+            Arguments.of("Using hack tool", true),
+            Arguments.of("SPECIFIC PHRASE", true),
+            Arguments.of("Specific Phrase", true),
+            Arguments.of("Normal message", false),
+            Arguments.of("[Info] Player joined", false),
+            Arguments.of("Specificphrase", false)
+        );
     }
 
     @AfterEach
@@ -64,18 +70,23 @@ public class RegexFilterTest {
 
     @Test
     void shouldHandleInvalidRegexSafely() {
-        // 设置包含无效正则的配置
-        ModConfig.getInstance().setRegexFilters(List.of("^valid.*", "[invalid[regex"));
+        // 准备包含有效和无效正则的列表
+        List<String> mixedPatterns = List.of("^valid.*", "[invalid[regex");
+        ModConfig.getInstance().setRegexFilters(mixedPatterns);
         ModConfig.save();
         ModConfig.load();
 
         ModConfig config = ModConfig.getInstance();
+        // 验证只编译有效正则
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
+        
+        // 验证模式内容
         assertThat(validPattern.pattern()).isEqualTo("^valid.*");
+        // 验证大小写敏感标志
         assertThat(validPattern.flags() & Pattern.CASE_INSENSITIVE).isEqualTo(0);
-        assertThat(validPattern.matcher("valid123").find()).isTrue();
-        assertThat(validPattern.matcher("[invalid[regex").find()).isFalse();
+        
+        // 验证过滤行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
