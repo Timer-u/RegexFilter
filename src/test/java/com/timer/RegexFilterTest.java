@@ -7,12 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import net.minecraft.text.Text;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.Arguments;
-import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class RegexFilterTest {
@@ -50,14 +49,13 @@ public class RegexFilterTest {
 
     private static Stream<Arguments> messageFilteringProvider() {
         return Stream.of(
-            Arguments.of("[System] Server restart", true),
-            Arguments.of("Using hack tool", true),
-            Arguments.of("SPECIFIC PHRASE", true),
-            Arguments.of("Specific Phrase", true),
-            Arguments.of("Normal message", false),
-            Arguments.of("[Info] Player joined", false),
-            Arguments.of("Specificphrase", false)
-        );
+                Arguments.of("[System] Server restart", true),
+                Arguments.of("Using hack tool", true),
+                Arguments.of("SPECIFIC PHRASE", true),
+                Arguments.of("Specific Phrase", true),
+                Arguments.of("Normal message", false),
+                Arguments.of("[Info] Player joined", false),
+                Arguments.of("Specificphrase", false));
     }
 
     @AfterEach
@@ -81,12 +79,12 @@ public class RegexFilterTest {
         // 验证只编译有效正则
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
-        
+
         // 验证模式内容
         assertThat(validPattern.pattern()).isEqualTo("^valid.*");
         // 验证大小写敏感标志
         assertThat(validPattern.flags() & Pattern.CASE_INSENSITIVE).isEqualTo(0);
-        
+
         // 验证过滤行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);

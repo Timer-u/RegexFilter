@@ -5,10 +5,10 @@ import static com.google.common.truth.Truth.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.*;
-import java.util.ArrayList;
 
 public class ModConfigTest {
     private static Path tempConfig;
@@ -38,10 +38,9 @@ public class ModConfigTest {
         // 设置包含无效正则的列表
         ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[invalid"));
         ModConfig.save();
-        
+
         // 验证清理后的列表
-        assertThat(ModConfig.getInstance().getRegexFilters())
-            .containsExactly("valid.*");
+        assertThat(ModConfig.getInstance().getRegexFilters()).containsExactly("valid.*");
     }
 
     @Test
@@ -56,7 +55,7 @@ public class ModConfigTest {
         // 设置有效正则列表
         ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[a-z]+"));
         ModConfig.getInstance().updateCompiledPatterns();
-        
+
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
         // 验证编译数量
         assertThat(compiled).hasSize(2);
@@ -69,7 +68,7 @@ public class ModConfigTest {
         // 设置混合正则列表
         ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[invalid["));
         ModConfig.getInstance().updateCompiledPatterns();
-        
+
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
         // 验证跳过无效正则
         assertThat(compiled).hasSize(1);
@@ -97,13 +96,12 @@ public class ModConfigTest {
             patterns.add("valid" + i + ".*");
             patterns.add("[invalid" + i + "["); // 无效模式
         }
-        
+
         ModConfig.getInstance().setRegexFilters(patterns);
         ModConfig.save();
         ModConfig.load();
-        
+
         // 验证只编译有效正则
-        assertThat(ModConfig.getInstance().getCompiledPatterns())
-            .hasSize(50);
+        assertThat(ModConfig.getInstance().getCompiledPatterns()).hasSize(50);
     }
 }
