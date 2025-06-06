@@ -60,7 +60,8 @@ jobs:
           if git diff-index --quiet HEAD --; then
             echo "No formatting changes"
           else
-            git commit -m "Auto-format code [skip ci]"
+            # 使用 Conventional Commits 规范的消息
+            git commit -m "style: auto-format code [skip ci]"
             git push "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:dev # 使用 GITHUB_TOKEN 推送避免权限问题
           fi
 
