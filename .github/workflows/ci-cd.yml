@@ -20,7 +20,7 @@ jobs:
     name: Dev Pipeline (Format, Test, Build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: github.ref == 'refs/heads/dev' # 仅在 dev 分支执行
+    if: github.ref == 'refs/heads/dev' # 在 dev 分支执行
     env:
       JAVA_VERSION: 21
       GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -29,9 +29,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }} # 显式指定分支
+          ref: ${{ github.ref }}
           fetch-depth: 0
-          set-safe-directory: true # 显式启用安全目录
+          set-safe-directory: true # 启用安全目录
 
       - name: Fix permissions
         run: chmod +x gradlew
@@ -60,9 +60,8 @@ jobs:
           if git diff-index --quiet HEAD --; then
             echo "No formatting changes"
           else
-            # 使用 Conventional Commits 规范的消息
             git commit -m "style: auto-format code [skip ci]"
-            git push "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:dev # 使用 GITHUB_TOKEN 推送避免权限问题
+            git push "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:dev
           fi
 
       - name: Build and Upload Artifact
@@ -90,7 +89,7 @@ jobs:
   main-pipeline:
     name: Main Pipeline (Build and Release)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # 仅在main分支执行
+    if: github.ref == 'refs/heads/main' # 在 main 分支执行
     timeout-minutes: 15
     env:
       JAVA_VERSION: 21
@@ -100,8 +99,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }} # 显式指定分支
-          set-safe-directory: true # 显式启用安全目录
+          ref: ${{ github.ref }}
+          set-safe-directory: true
 
       - name: Fix permissions
         run: chmod +x gradlew
@@ -116,7 +115,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-read-only: true # 仅读取缓存
+          cache-read-only: true # 读取缓存
 
       - name: Build Artifact
         run: ./gradlew build --build-cache
@@ -129,7 +128,7 @@ jobs:
 
   release:
     name: Publish Release
-    needs: main-pipeline # 仅依赖 main 分支的构建作业
+    needs: main-pipeline # 依赖 main 分支的构建作业
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release
