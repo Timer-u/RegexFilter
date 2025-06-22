@@ -1,5 +1,6 @@
 package com.timer;
 
+import net.minecraft.text.Text;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,7 +10,6 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ModConfigScreen {
