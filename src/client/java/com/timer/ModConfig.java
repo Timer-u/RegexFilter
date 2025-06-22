@@ -69,6 +69,12 @@ public class ModConfig {
         compiledPatterns = newPatterns;
     }
 
+    // 更新正则列表
+    public void setRegexFilters(List<String> newFilters) {
+        this.regexFilters = new CopyOnWriteArrayList<>(newFilters);
+        updateCompiledPatterns(); // 更新编译缓存
+    }
+
     // 加载配置
     public static void load() {
         LOGGER.info("Loading config...");
@@ -97,11 +103,27 @@ public class ModConfig {
                 // 初始化线程安全列表
                 INSTANCE.regexFilters = new CopyOnWriteArrayList<>(loadedRecord.regexFilters());
 
-                // 数据清理：过滤空值和无效正则
-                INSTANCE.regexFilters =
+                List<String> validRegex =
                         INSTANCE.regexFilters.stream()
                                 .filter(str -> str != null && !str.trim().isEmpty())
-                                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+                                .filter(
+                                        str -> {
+                                            try {
+                                                Pattern.compile(str); // 验证正则表达式有效性
+                                                return true;
+                                            } catch (PatternSyntaxException e) {
+                                                LOGGER.warn(
+                                                        "Removing invalid pattern during loading: {}",
+                                                        str);
+                                                return false;
+                                            }
+                                        })
+                                .collect(Collectors.toList());
+
+                INSTANCE.regexFilters = new CopyOnWriteArrayList<>(validRegex);
+
+                // 加载后更新预编译正则缓存
+                INSTANCE.updateCompiledPatterns();
             }
         } catch (IOException e) {
             LOGGER.error("IO Error loading config: {}", e.getMessage());
@@ -110,27 +132,20 @@ public class ModConfig {
             LOGGER.error("Invalid JSON syntax: {}", e.getMessage());
             INSTANCE = new ModConfig();
         } finally {
-            INSTANCE.updateCompiledPatterns(); // 始终更新预编译正则表达式
             LOGGER.info("Loaded {} valid regex patterns", INSTANCE.compiledPatterns.size());
         }
     }
 
     // 保存配置
     public static void save() {
-        // 创建要保存的 ConfigRecord 实例
-        ConfigRecord toSave =
-                new ConfigRecord(
-                        INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters) // 生成不可变副本
-                        );
-
-        // 清理无效正则表达式
+        // 清理无效正则表达式并更新实例数据
         List<String> cleanList =
-                toSave.regexFilters().stream()
+                INSTANCE.regexFilters.stream()
                         .filter(str -> str != null && !str.trim().isEmpty())
                         .filter(
                                 str -> {
                                     try {
-                                        Pattern.compile(str); // 仅用于验证，不重复编译
+                                        Pattern.compile(str);
                                         return true;
                                     } catch (PatternSyntaxException e) {
                                         LOGGER.warn("Removing invalid pattern: {}", str);
@@ -139,15 +154,19 @@ public class ModConfig {
                                 })
                         .collect(Collectors.toList());
 
-        // 更新实例并保存
-        INSTANCE.regexFilters = new CopyOnWriteArrayList<>(cleanList);
-        INSTANCE.updateCompiledPatterns(); // 保存前更新缓存
+        // 使用线程安全集合更新实例的正则列表
+        INSTANCE.setRegexFilters(cleanList);
 
+        // 创建要保存的 ConfigRecord 实例
+        ConfigRecord toSave =
+                new ConfigRecord(INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters));
+
+        // 序列化并写入配置文件
         try {
-            Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
-            String json = GSON.toJson(toSave); // 序列化 ConfigRecord
+            Files.createDirectories(CONFIG_PATH.getParent());
+            String json = GSON.toJson(toSave);
             Files.writeString(CONFIG_PATH, json);
-            LOGGER.info("Config saved with {} patterns", cleanList.size());
+            LOGGER.info("Config saved with {} valid patterns", cleanList.size());
         } catch (IOException e) {
             LOGGER.error("Config save failed", e);
         }
@@ -161,10 +180,5 @@ public class ModConfig {
     // 外部访问正则列表时返回不可变副本
     public List<String> getRegexFilters() {
         return List.copyOf(regexFilters);
-    }
-
-    // 更新正则列表
-    public void setRegexFilters(List<String> newFilters) {
-        this.regexFilters = new CopyOnWriteArrayList<>(newFilters);
     }
 }
