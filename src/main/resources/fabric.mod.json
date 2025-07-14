@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
   "depends": {
-    "minecraft": "1.21.x",
+    "minecraft": "1.21.7",
     "fabric-api": "*",
-    "java": ">=17",
+    "java": ">=21",
     "modmenu": ">=11.0.0",
-    "fabricloader": ">=0.15.0",
-    "cloth-config": ">=15.0.127"
+    "fabricloader": ">=0.16.14",
+    "cloth-config": ">=19.0.147"
   },
   "custom": {"modmenu": {}},
   "icon": "assets/regexfilter/icon.png",
-  "description": "Advanced chat filtering with regex patterns | 基于正则表达式的聊天过滤器",
-  "version": "1.1.1",
+  "description": "Chat filtering with regex patterns | 基于正则表达式的聊天过滤器",
+  "version": "1.1.2-alpha",
   "license": "GPL-3.0-only",
   "suggests": {},
   "environment": "client",
   "contact": {
-    "sources": "https://github.com/Timer-keeper/RegexFilter",
-    "issues": "https://github.com/Timer-keeper/RegexFilter/issues",
-    "homepage": "https://github.com/Timer-keeper/RegexFilter"
+    "sources": "https://github.com/Timer-u/RegexFilter",
+    "issues": "https://github.com/Timer-u/RegexFilter/issues",
+    "homepage": "https://github.com/Timer-u/RegexFilter"
   },
   "name": "RegexFilter",
   "entrypoints": {
