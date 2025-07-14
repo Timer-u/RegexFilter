@@ -42,11 +42,11 @@ dependencies {
     modApi "com.terraformersmc:modmenu:${modmenu_version}"
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.12.1"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.12.1"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.12.1"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.13.3"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.13.3"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.13.3"
     testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-    testImplementation "org.mockito:mockito-core:5.16.1"
+    testImplementation "org.mockito:mockito-core:5.18.0"
     testImplementation "com.google.truth:truth:1.4.4"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -120,7 +120,7 @@ spotless {
     // 格式化 Java 文件
     java {
         target "src/**/*.java"
-        googleJavaFormat("1.19.2").aosp()
+        googleJavaFormat("1.28.0").aosp()
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
