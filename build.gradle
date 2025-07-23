@@ -26,15 +26,7 @@ repositories {
 }
 
 loom {
-    splitEnvironmentSourceSets()
-
-    mods {
-        "regexfilter" {
-            sourceSet sourceSets.main
-            sourceSet sourceSets.client
-        }
-    }
-
+    // splitEnvironmentSourceSets() and mods block removed
 }
 
 dependencies {
