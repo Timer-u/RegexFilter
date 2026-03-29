@@ -48,6 +48,12 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      - name: Clean Gradle caches
+        run: |
+          ./gradlew clean
+          rm -rf .gradle
+          rm -rf ~/.gradle/caches/fabric-loom
+
       - name: Run Tests
         run: ./gradlew test --parallel --max-workers=4
 
