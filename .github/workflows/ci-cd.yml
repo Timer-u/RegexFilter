@@ -42,23 +42,11 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
 
-      - name: Debug access widener files
-        run: |
-          echo "=== Searching for .accesswidener files in repository ==="
-          find . -name "*.accesswidener" -type f -exec echo "Found: {}" \; -exec cat {} \;
-          echo "=== gradle.properties content ==="
-          cat gradle.properties
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
           cache-read-only: false
-
-      - name: Clean Gradle caches
-        run: |
-          rm -rf .gradle
-          rm -rf ~/.gradle/caches/fabric-loom
 
       - name: Run Tests
         run: ./gradlew test --parallel --max-workers=4 --stacktrace --info
