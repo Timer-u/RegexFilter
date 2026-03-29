@@ -55,7 +55,7 @@ jobs:
         run: ./gradlew spotlessApply
         
       - name: Commit formatted changes with verification
-        uses: IAreKyleW00t/verified-bot-commit@v1
+        uses: IAreKyleW00t/verified-bot-commit@v2
         with:
           message: "style: auto-format code [skip ci]"
           files: "**"
