@@ -4,7 +4,7 @@
     "minecraft": "1.21.8",
     "fabric-api": "*",
     "java": ">=21",
-    "modmenu": ">=11.0.0",
+    "modmenu": ">=15.0.2",
     "fabricloader": ">=0.18.5",
     "cloth-config": ">=19.0.147"
   },
