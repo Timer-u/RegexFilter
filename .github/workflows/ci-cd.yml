@@ -20,7 +20,7 @@ jobs:
     name: Dev Pipeline (Format, Test, Build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: github.ref == 'refs/heads/dev' # 在 dev 分支执行
+    if: github.ref == 'refs/heads/dev'
     env:
       JAVA_VERSION: 21
       GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -31,7 +31,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
-          set-safe-directory: true # 启用安全目录
+          set-safe-directory: true
 
       - name: Fix permissions
         run: chmod +x gradlew
@@ -46,37 +46,31 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-read-only: false # 允许写入缓存
+          cache-read-only: false
 
       - name: Run Tests
-        run: ./gradlew test --parallel --max-workers=4
+        run: ./gradlew test --parallel --max-workers=4 --stacktrace --info
 
       - name: Auto-format code
-        run: |
-          ./gradlew spotlessApply
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -u
-          if git diff-index --quiet HEAD --; then
-            echo "No formatting changes"
-          else
-            git commit -m "style: auto-format code [skip ci]"
-            git push "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:dev
-          fi
+        run: ./gradlew spotlessApply
+        
+      - name: Commit formatted changes with verification
+        uses: IAreKyleW00t/verified-bot-commit@v1
+        with:
+          message: "style: auto-format code [skip ci]"
+          files: "**"
 
       - name: Build and Upload Artifact
         run: ./gradlew build --build-cache
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 上传 JAR 文件
       - name: Upload Dev Artifact
         uses: actions/upload-artifact@v4
         with:
           name: dev-mod-package
           path: build/libs/*.jar
 
-      # 上传测试报告
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
@@ -89,7 +83,7 @@ jobs:
   main-pipeline:
     name: Main Pipeline (Build and Release)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # 在 main 分支执行
+    if: github.ref == 'refs/heads/main'
     timeout-minutes: 15
     env:
       JAVA_VERSION: 21
@@ -115,7 +109,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-read-only: true # 读取缓存
+          cache-read-only: true
 
       - name: Build Artifact
         run: ./gradlew build --build-cache
@@ -128,7 +122,7 @@ jobs:
 
   release:
     name: Publish Release
-    needs: main-pipeline # 依赖 main 分支的构建作业
+    needs: main-pipeline
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: release

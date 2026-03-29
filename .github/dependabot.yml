@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Gradle 依赖更新
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "dev" # 向 dev 分支提交 PR
+    commit-message:
+      prefix: "chore"
+
+  # GitHub Actions 依赖更新
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev" # 向 dev 分支提交 PR

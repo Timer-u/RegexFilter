@@ -1,7 +1,0 @@
-{
-  "mixins": [],
-  "package": "com.timer.mixin",
-  "injectors": {"defaultRequire": 1},
-  "compatibilityLevel": "JAVA_21",
-  "required": true
-}

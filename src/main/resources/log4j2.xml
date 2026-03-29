@@ -7,7 +7,6 @@
     >
       <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger]: %msg%n" />
     </Console>
-    <!-- 使用动态路径 -->
     <File
       name="File"
       fileName="${sys:regexfilter.logdir}/regexfilter.log"
