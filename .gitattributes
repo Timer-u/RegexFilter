@@ -4,6 +4,8 @@
 # Linux start script should use lf
 /gradlew        text eol=lf
 
-# These are Windows script files and should use crlf
-*.bat           text eol=crlf
+# gradlew.bat should also use lf
+/gradlew.bat    text eol=lf
 
+# Other Windows script files can use crlf
+*.bat           text eol=crlf
