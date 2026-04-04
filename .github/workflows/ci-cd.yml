@@ -57,12 +57,15 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if ! git diff --quiet; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "Changes detected, will commit."
-          else
+          git config core.filemode false
+          git add -A
+          if git diff --cached --ignore-space-change --quiet; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes, skipping commit."
+            echo "No meaningful changes, skipping commit."
+            git reset --hard HEAD
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Meaningful changes detected, will commit."
           fi
         shell: bash
 
