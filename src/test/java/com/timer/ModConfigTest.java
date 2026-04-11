@@ -57,15 +57,12 @@ public class ModConfigTest {
         ModConfig.getInstance().updateCompiledPatterns();
 
         List<Pattern> compiled = ModConfig.getInstance().getCompiledPatterns();
-        // 验证编译数量
         assertThat(compiled).hasSize(2);
-        // 验证模式内容
         assertThat(compiled.get(0).pattern()).isEqualTo("valid.*");
     }
 
     @Test
     void shouldSkipInvalidPatternsDuringCompilation() {
-        // 设置混合正则列表
         ModConfig.getInstance().setRegexFilters(List.of("valid.*", "[invalid["));
         ModConfig.getInstance().updateCompiledPatterns();
 
@@ -83,25 +80,21 @@ public class ModConfigTest {
         ModConfig.getInstance().setRegexFilters(List.of());
         ModConfig.save();
         ModConfig.load();
-        // 验证编译结果为空
         assertThat(ModConfig.getInstance().getCompiledPatterns()).isEmpty();
     }
 
-    // 大量正则表达式处理
     @Test
     void shouldHandleLargeNumberOfPatterns() {
-        // 准备测试数据 (50 个有效 + 50 个无效)
         List<String> patterns = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
             patterns.add("valid" + i + ".*");
-            patterns.add("[invalid" + i + "["); // 无效模式
+            patterns.add("[invalid" + i + "[");
         }
 
         ModConfig.getInstance().setRegexFilters(patterns);
         ModConfig.save();
         ModConfig.load();
 
-        // 验证只编译有效正则
         assertThat(ModConfig.getInstance().getCompiledPatterns()).hasSize(50);
     }
 }

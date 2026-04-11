@@ -36,28 +36,24 @@ public class ModConfig {
             FabricLoader.getInstance().getConfigDir().resolve("regexfilter.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    // 添加静态方法用于测试环境设置路径
     public static void setConfigPathForTest(Path path) {
         CONFIG_PATH = path;
     }
 
-    // 预编译的正则表达式缓存
     private transient List<Pattern> compiledPatterns = new CopyOnWriteArrayList<>();
 
-    // 更新预编译的正则表达式
     void updateCompiledPatterns() {
         List<Pattern> newPatterns = new CopyOnWriteArrayList<>();
         if (regexFilters != null) {
             for (String regex : regexFilters) {
                 try {
-                    // 检查是否已经编译过相同的正则表达式
                     Optional<Pattern> existing =
                             compiledPatterns.stream()
                                     .filter(p -> p.pattern().equals(regex))
                                     .findFirst();
 
                     if (existing.isPresent()) {
-                        newPatterns.add(existing.get()); // 重用已编译的 Pattern
+                        newPatterns.add(existing.get());
                     } else {
                         newPatterns.add(Pattern.compile(regex));
                     }
@@ -69,10 +65,9 @@ public class ModConfig {
         compiledPatterns = newPatterns;
     }
 
-    // 更新正则列表
     public void setRegexFilters(List<String> newFilters) {
         this.regexFilters = new CopyOnWriteArrayList<>(newFilters);
-        updateCompiledPatterns(); // 更新编译缓存
+        updateCompiledPatterns();
     }
 
     // 加载配置
@@ -81,26 +76,21 @@ public class ModConfig {
         try {
             if (!Files.exists(CONFIG_PATH)) {
                 LOGGER.info("Creating default config");
-                Files.createDirectories(CONFIG_PATH.getParent()); // 确保目录存在
+                Files.createDirectories(CONFIG_PATH.getParent());
                 INSTANCE = new ModConfig();
-                save(); // 调用 save() 创建默认文件
+                save();
                 return;
             }
 
-            // 使用 BufferedReader 读取文件
             try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
-                // 反序列化为 ConfigRecord
                 ConfigRecord loadedRecord = GSON.fromJson(reader, ConfigRecord.class);
 
-                // 处理可能的空值或无效 JSON
                 if (loadedRecord == null) {
                     LOGGER.error("Config file is invalid, using default configuration");
                     loadedRecord = new ConfigRecord(true, new CopyOnWriteArrayList<>());
                 }
 
-                // 将 ConfigRecord 数据复制到当前实例
                 INSTANCE.enabled = loadedRecord.enabled();
-                // 初始化线程安全列表
                 INSTANCE.regexFilters = new CopyOnWriteArrayList<>(loadedRecord.regexFilters());
 
                 List<String> validRegex =
@@ -109,7 +99,7 @@ public class ModConfig {
                                 .filter(
                                         str -> {
                                             try {
-                                                Pattern.compile(str); // 验证正则表达式有效性
+                                                Pattern.compile(str);
                                                 return true;
                                             } catch (PatternSyntaxException e) {
                                                 LOGGER.warn(
@@ -122,7 +112,6 @@ public class ModConfig {
 
                 INSTANCE.regexFilters = new CopyOnWriteArrayList<>(validRegex);
 
-                // 加载后更新预编译正则缓存
                 INSTANCE.updateCompiledPatterns();
             }
         } catch (IOException e) {
@@ -138,7 +127,6 @@ public class ModConfig {
 
     // 保存配置
     public static void save() {
-        // 清理无效正则表达式并更新实例数据
         List<String> cleanList =
                 INSTANCE.regexFilters.stream()
                         .filter(str -> str != null && !str.trim().isEmpty())
@@ -154,14 +142,11 @@ public class ModConfig {
                                 })
                         .collect(Collectors.toList());
 
-        // 使用线程安全集合更新实例的正则列表
         INSTANCE.setRegexFilters(cleanList);
 
-        // 创建要保存的 ConfigRecord 实例
         ConfigRecord toSave =
                 new ConfigRecord(INSTANCE.enabled, List.copyOf(INSTANCE.regexFilters));
 
-        // 序列化并写入配置文件
         try {
             Files.createDirectories(CONFIG_PATH.getParent());
             String json = GSON.toJson(toSave);
@@ -172,12 +157,10 @@ public class ModConfig {
         }
     }
 
-    // 获取只读的预编译正则列表
     public List<Pattern> getCompiledPatterns() {
         return Collections.unmodifiableList(compiledPatterns);
     }
 
-    // 外部访问正则列表时返回不可变副本
     public List<String> getRegexFilters() {
         return List.copyOf(regexFilters);
     }

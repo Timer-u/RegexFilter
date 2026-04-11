@@ -36,14 +36,13 @@ public class ModConfigScreen {
                                 ModConfig.getInstance().enabled)
                         .setDefaultValue(DEFAULT_ENABLED)
                         .setSaveConsumer(newValue -> ModConfig.getInstance().enabled = newValue)
-                        // 保持原有Cloth Config本地化键
                         .setYesNoTextSupplier(
                                 value ->
                                         Text.translatable(
                                                 value
                                                         ? "text.cloth-config.on"
                                                         : "text.cloth-config.off"))
-                        .setTooltip(Text.translatable("tooltip.enabled")) // 还原为原始单条提示
+                        .setTooltip(Text.translatable("tooltip.enabled"))
                         .requireRestart()
                         .build());
 
@@ -52,13 +51,11 @@ public class ModConfigScreen {
                 entryBuilder
                         .startStrList(
                                 Text.translatable("option.regex_list"),
-                                // 使用 CopyOnWriteArrayList 包装当前配置值
                                 new CopyOnWriteArrayList<>(
                                         ModConfig.getInstance().getRegexFilters()))
                         .setDefaultValue(Collections.emptyList())
-                        .setInsertButtonEnabled(true) // 允许插入按钮
-                        .setDeleteButtonEnabled(true) // 允许删除按钮
-                        // 实时验证正则表达式有效性
+                        .setInsertButtonEnabled(true)
+                        .setDeleteButtonEnabled(true)
                         .setCellErrorSupplier(
                                 value -> {
                                     if (value == null || value.isEmpty()) {
@@ -74,16 +71,12 @@ public class ModConfigScreen {
                                                         e.getDescription()));
                                     }
                                 })
-                        // 保存时自动清理空值和无效正则
                         .setSaveConsumer(
                                 newList -> {
-                                    // 清理空值和空白字符串
                                     newList.removeIf(str -> str == null || str.trim().isEmpty());
-                                    // 使用线程安全集合更新配置
                                     ModConfig.getInstance()
                                             .setRegexFilters(new CopyOnWriteArrayList<>(newList));
                                 })
-                        // 工具提示配置
                         .setTooltip(
                                 Text.translatable("tooltip.regex_list.1"),
                                 Text.translatable("tooltip.regex_list.2"))

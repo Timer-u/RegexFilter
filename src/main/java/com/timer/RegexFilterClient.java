@@ -17,7 +17,6 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
 
     @Override
     public void onInitializeClient() {
-        // 设置日志目录系统属性
         Path logDir = FabricLoader.getInstance().getGameDir().resolve("logs");
         System.setProperty("regexfilter.logdir", logDir.toString());
 
@@ -53,7 +52,6 @@ public class RegexFilterClient implements ClientModInitializer, ModMenuApi {
         return ModConfigScreen::createConfigScreen;
     }
 
-    // 测试用方法
     static boolean shouldAllowMessage(Text message) {
         if (!ModConfig.getInstance().enabled) return true;
 

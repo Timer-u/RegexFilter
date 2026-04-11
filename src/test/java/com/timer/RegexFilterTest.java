@@ -69,23 +69,18 @@ public class RegexFilterTest {
 
     @Test
     void shouldHandleInvalidRegexSafely() {
-        // 准备包含有效和无效正则的列表
         List<String> mixedPatterns = List.of("^valid.*", "[invalid[regex");
         ModConfig.getInstance().setRegexFilters(mixedPatterns);
         ModConfig.save();
         ModConfig.load();
 
         ModConfig config = ModConfig.getInstance();
-        // 验证只编译有效正则
         assertThat(config.getCompiledPatterns()).hasSize(1);
         Pattern validPattern = config.getCompiledPatterns().get(0);
 
-        // 验证模式内容
         assertThat(validPattern.pattern()).isEqualTo("^valid.*");
-        // 验证大小写敏感标志
         assertThat(validPattern.flags() & Pattern.CASE_INSENSITIVE).isEqualTo(0);
 
-        // 验证过滤行为
         assertShouldBlock("valid123", true);
         assertShouldBlock("[invalid[regex", false);
     }
