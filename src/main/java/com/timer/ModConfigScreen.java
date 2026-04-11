@@ -23,7 +23,8 @@ public class ModConfigScreen {
                         .setSavingRunnable(ModConfig::save)
                         .setDefaultBackgroundTexture(
                                 Identifier.of("minecraft", "textures/block/stone.png"))
-                        .setDoesConfirmSave(true);
+                        .setDoesConfirmSave(true)
+                        .setTransparentBackground(false);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("category.general"));
