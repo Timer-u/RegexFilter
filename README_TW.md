@@ -9,13 +9,13 @@ Config API 的可視化設定介面。
 
 ## 依賴項目
 
-| 依賴             | 類型 | 版本       | 連結                                                                                                                             |
-| ---------------- | ---- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Minecraft        | 必須 | 1.21       | [Official Website](https://www.minecraft.net/)                                                                                   |
-| Fabric Loader    | 必須 | >=0.15.0   | [Github](https://github.com/FabricMC/fabric-loader)                                                                              |
-| Fabric API       | 必須 | 任意       | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api) &#124; [Modrinth](https://modrinth.com/mod/fabric-api)     |
-| Cloth Config API | 必須 | >=15.0.127 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/cloth-config) &#124; [Modrinth](https://modrinth.com/mod/cloth-config) |
-| Mod Menu         | 必須 | >=11.0.0   | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/modmenu) &#124; [Modrinth](https://modrinth.com/mod/modmenu)           |
+| 依賴             | 類型 | 版本      | 連結                                                                                                                             |
+| ---------------- | ---- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Minecraft        | 必須 | ≥1.21     | [Official Website](https://www.minecraft.net/)                                                                                   |
+| Fabric Loader    | 必須 | 任意      | [Github](https://github.com/FabricMC/fabric-loader)                                                                              |
+| Fabric API       | 必須 | 任意      | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api) &#124; [Modrinth](https://modrinth.com/mod/fabric-api)     |
+| Cloth Config API | 必須 | ≥15.0.140 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/cloth-config) &#124; [Modrinth](https://modrinth.com/mod/cloth-config) |
+| Mod Menu         | 必須 | ≥11.0.0   | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/modmenu) &#124; [Modrinth](https://modrinth.com/mod/modmenu)           |
 
 ## 使用指南
 

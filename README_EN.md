@@ -10,13 +10,13 @@ API.
 
 ## Dependencies
 
-| Dependency       | Type     | Version    | Links                                                                                                                            |
-| ---------------- | -------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Minecraft        | Required | 1.21       | [Official Website](https://www.minecraft.net/)                                                                                   |
-| Fabric Loader    | Required | >=0.15.0   | [Github](https://github.com/FabricMC/fabric-loader)                                                                              |
-| Fabric API       | Required | Any        | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api) &#124; [Modrinth](https://modrinth.com/mod/fabric-api)     |
-| Cloth Config API | Required | >=15.0.127 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/cloth-config) &#124; [Modrinth](https://modrinth.com/mod/cloth-config) |
-| Mod Menu         | Required | >=11.0.0   | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/modmenu) &#124; [Modrinth](https://modrinth.com/mod/modmenu)           |
+| Dependency       | Type     | Version   | Links                                                                                                                            |
+| ---------------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Minecraft        | Required | ≥1.21     | [Official Website](https://www.minecraft.net/)                                                                                   |
+| Fabric Loader    | Required | Any       | [Github](https://github.com/FabricMC/fabric-loader)                                                                              |
+| Fabric API       | Required | Any       | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api) &#124; [Modrinth](https://modrinth.com/mod/fabric-api)     |
+| Cloth Config API | Required | ≥15.0.140 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/cloth-config) &#124; [Modrinth](https://modrinth.com/mod/cloth-config) |
+| Mod Menu         | Required | ≥11.0.0   | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/modmenu) &#124; [Modrinth](https://modrinth.com/mod/modmenu)           |
 
 ## Usage Guide
 
