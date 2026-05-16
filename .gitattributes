@@ -1,11 +1,40 @@
 #
 # https://help.github.com/articles/dealing-with-line-endings/
 #
-# Linux start script should use lf
+
+# 默认自动识别换行符
+* text=auto
+
+# Gradle wrapper 脚本使用 LF
 /gradlew        text eol=lf
 
-# gradlew.bat should also use lf
+# Java/Gradle 项目源文件使用 LF
+*.java          text eol=lf
+*.kt            text eol=lf
+*.gradle        text eol=lf
+*.properties    text eol=lf
+*.md            text eol=lf
+*.xml           text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.json          text eol=lf
+
+# 其他 Windows 批处理文件使用 CRLF
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+
+# gradlew.bat 例外：也使用 LF
 /gradlew.bat    text eol=lf
 
-# Other Windows script files can use crlf
-*.bat           text eol=crlf
+# 二进制文件，禁止换行符转换
+*.jar           binary
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.svg           text
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.eot           binary
